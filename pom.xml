@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>edu.illinois.i3.htrc</groupId>
+	<artifactId>RegistryExtension</artifactId>
+	<version>0.2.0-SNAPSHOT</version>
+	<packaging>carbon/application</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>edu.illinois.i3.htrc.registry</groupId>
+            <artifactId>ExtensionAPI</artifactId>
+            <version>0.2.0-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <public.svn.root>svn://svn.code.sf.net/p/htrc/code</public.svn.root>
+        <developer.svn.root>svn+ssh://svn.code.sf.net/p/htrc/code</developer.svn.root>
+        <fisheye.svn.root>http://fisheye.htrc.illinois.edu/changelog</fisheye.svn.root>
+        <edu.illinois.i3.htrc.registry:ExtensionAPI:0.2.0-SNAPSHOT>capp/ApplicationServer</edu.illinois.i3.htrc.registry:ExtensionAPI:0.2.0-SNAPSHOT>
+        <artifact.types>bpel/workflow=zip,cep/bucket=xml,lib/registry/filter=jar,service/rule=aar,lib/library/bundle=jar,service/dataservice=dbs,synapse/local-entry=xml,synapse/proxy-service=xml,carbon/application=car,registry/resource=zip,lib/dataservice/validator=jar,synapse/endpoint=xml,web/application=war,service/axis2=aar,lib/carbon/ui=jar,synapse/sequence=xml,synapse/configuration=xml,lib/registry/handlers=jar,wso2/gadget=dar,lib/synapse/mediator=jar,webapp/jaxws=war</artifact.types>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>maven-car-plugin</artifactId>
+                <version>2.0.1</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>car</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>car</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration />
+            </plugin>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>maven-car-deploy-plugin</artifactId>
+                <version>1.0.2</version>
+                <extensions>true</extensions>
+                <configuration />
+            </plugin>
+        </plugins>
+    </build>
+
+	<name>RegistryExtension</name>
+	<description>HTRC Registry Extension</description>
+
+    <organization>
+        <name>HathiTrust Research Center</name>
+        <url>http://www.hathitrust.org/htrc</url>
+    </organization>
+
+    <!-- Environment Settings -->
+    <issueManagement>
+        <system>jira</system>
+        <url>http://jira.htrc.illinois.edu/browse/REG</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>bamboo</system>
+        <url>http://bamboo.htrc.illinois.edu/browse/REG</url>
+    </ciManagement>
+
+    <scm>
+        <connection>scm:svn:${public.svn.root}/HTRC-Data-RegistryExtension/trunk</connection>
+        <developerConnection>scm:svn:${developer.svn.root}/HTRC-Data-RegistryExtension/trunk</developerConnection>
+        <url>${fisheye.svn.root}/HTRC-Data-RegistryExtension/trunk</url>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <name>HTRC Nexus Repository</name>
+            <url>http://htrc.illinois.edu/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>nexus</id>
+            <name>HTRC Nexus Repository</name>
+            <url>http://htrc.illinois.edu/nexus/content/groups/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <distributionManagement>
+        <repository>
+            <id>htrc.nexus.releases</id>
+            <name>HTRC Release Repository</name>
+            <url>http://htrc.illinois.edu/nexus/content/repositories/releases/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>htrc.nexus.snapshots</id>
+            <name>HTRC Snapshot Repository</name>
+            <url>http://htrc.illinois.edu/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+</project>
