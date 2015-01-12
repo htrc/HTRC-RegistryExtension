@@ -115,7 +115,8 @@ public interface FilesAPI {
 			@Context HttpServletRequest request,
 			@PathParam("path") String folderPath,
 			@DefaultValue("false") @QueryParam("public") boolean isPublic,
-			List<Attachment> attachments);
+            @QueryParam("user") String user,
+            List<Attachment> attachments);
 
 	/**
 	 * PUT: Upload a file
@@ -134,6 +135,7 @@ public interface FilesAPI {
 			@HeaderParam("Content-Type") MediaType contentType,
 			@PathParam("path") String filePath,
 			@DefaultValue("false") @QueryParam("public") boolean isPublic,
+            @QueryParam("user") String user,
 			InputStream fileStream);
 
 	/**

@@ -236,9 +236,15 @@ public class FilesAPIImpl implements FilesAPI {
 			@Context HttpServletRequest request,
 			@PathParam("path") String path,
 			@DefaultValue("false") @QueryParam("public") boolean isPublic,
+            @QueryParam("user") String user,
 			List<Attachment> attachments) {
 
-		String userName = request.getRemoteUser();
+        String userName;
+        if(user != null && user.length() > 0){
+            userName = user;
+        }else{
+            userName  = request.getRemoteUser();
+        }
 		if (!path.startsWith("/")) path = "/" + path;
 		if (!path.endsWith("/")) path += "/";
 		Log.debug(String.format("uploadToFolder: path=%s, public=%s, user=%s", path, isPublic, userName));
@@ -297,9 +303,15 @@ public class FilesAPIImpl implements FilesAPI {
 			@HeaderParam("Content-Type") MediaType contentType,
 			@PathParam("path") String path,
 			@DefaultValue("false") @QueryParam("public") boolean isPublic,
+            @QueryParam("user") String user,
 			InputStream fileStream) {
 
-		String userName = request.getRemoteUser();
+        String userName;
+        if(user != null && user.length() > 0){
+            userName = user;
+        }else{
+            userName  = request.getRemoteUser();
+        }
 		if (!path.startsWith("/")) path = "/" + path;
 		Log.debug(String.format("uploadFile: path=%s, contentType=%s, public=%s, user=%s", path, contentType, isPublic, userName));
 
