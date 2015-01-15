@@ -36,6 +36,7 @@ import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 
 import edu.illinois.i3.htrc.registry.api.HTRCMediaTypes;
@@ -44,6 +45,7 @@ import edu.illinois.i3.htrc.registry.api.RegistryExtensionConfig;
 import edu.illinois.i3.htrc.registry.api.utils.FileUtils;
 import edu.illinois.i3.htrc.registry.api.utils.RegistryUtils;
 import edu.illinois.i3.htrc.registry.entities.file.Entry;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 /**
  * JAX-RS implementation for {@link FilesAPI}
@@ -89,6 +91,11 @@ public class FilesAPIImpl implements FilesAPI {
 			@DefaultValue("false") @QueryParam("public") boolean listPublic) {
 
 		String userName = request.getRemoteUser();
+
+		if(userName != null){
+			userName = MultitenantUtils.getTenantAwareUsername(userName);
+		}
+
 		if (!path.startsWith("/")) path = "/" + path;
 
 		Log.debug(String.format("listContents: path=%s, nameFilter=%s, typeFilter=%s, recursive=%s, public=%s, user=%s",
@@ -132,6 +139,11 @@ public class FilesAPIImpl implements FilesAPI {
 			@DefaultValue("false") @QueryParam("public") boolean checkPublic) {
 
 		String userName = request.getRemoteUser();
+
+		if(userName != null){
+			userName = MultitenantUtils.getTenantAwareUsername(userName);
+		}
+
 		if (!path.startsWith("/")) path = "/" + path;
 		Log.debug(String.format("checkIfExists: path=%s, public=%s, user=%s", path, checkPublic, userName));
 
@@ -167,6 +179,11 @@ public class FilesAPIImpl implements FilesAPI {
 			@DefaultValue("false") @QueryParam("public") boolean getPublic) {
 
 		String userName = request.getRemoteUser();
+
+		if(userName != null){
+			userName = MultitenantUtils.getTenantAwareUsername(userName);
+		}
+
 		if (!path.startsWith("/")) path = "/" + path;
 
 		Log.debug(String.format("getFileOrFolder: path=%s, nameFilter=%s, typeFilter=%s, public=%s, user=%s",
@@ -192,7 +209,14 @@ public class FilesAPIImpl implements FilesAPI {
 				Collection collection = (Collection) resource;
 				List<Attachment> attachments = new ArrayList<Attachment>();
 				for (String child : collection.getChildren()) {
-					resource = registry.get(child);
+					try {
+						resource = registry.get(child);
+					} catch (AuthorizationFailedException afe){
+						Log.warn("getFileOrFolder: Registry authorization failure. This should not happen." +
+								" But latest version of getChildren returns private resources too.");
+						continue;
+					}
+
 					if (resource instanceof Collection)
 						continue;
 					String attachmentName = child.substring(child.lastIndexOf("/") + 1);
@@ -239,17 +263,26 @@ public class FilesAPIImpl implements FilesAPI {
             @QueryParam("user") String user,
 			List<Attachment> attachments) {
 
-        String userName;
+		String userName;
+		String authenticatedUser = request.getRemoteUser();
+
+		if(authenticatedUser != null){
+			authenticatedUser = MultitenantUtils.getTenantAwareUsername(authenticatedUser);
+		}
+
+		// Allowing uploads to someone else files directory. (Requirement for Agent)
+		// TODO: Check permission of authenticated user.
         if(user != null && user.length() > 0){
             userName = user;
         }else{
-            userName  = request.getRemoteUser();
+            userName  = authenticatedUser;
         }
+
 		if (!path.startsWith("/")) path = "/" + path;
 		if (!path.endsWith("/")) path += "/";
 		Log.debug(String.format("uploadToFolder: path=%s, public=%s, user=%s", path, isPublic, userName));
 
-		if (userName == null)
+		if (authenticatedUser == null)
 			return Response.status(Status.UNAUTHORIZED).entity("Not authenticated").type(MediaType.TEXT_PLAIN).build();
 
 		try {
@@ -306,16 +339,26 @@ public class FilesAPIImpl implements FilesAPI {
             @QueryParam("user") String user,
 			InputStream fileStream) {
 
-        String userName;
-        if(user != null && user.length() > 0){
-            userName = user;
-        }else{
-            userName  = request.getRemoteUser();
-        }
+		String userName;
+		String authenticatedUser = request.getRemoteUser();
+
+		if(authenticatedUser != null){
+			authenticatedUser = MultitenantUtils.getTenantAwareUsername(authenticatedUser);
+		}
+
+		// Allowing uploads to someone else files directory. (Requirement for Agent)
+		// TODO: Check permission of authenticated user.
+		if(user != null && user.length() > 0){
+			userName = user;
+		}else{
+			userName  = authenticatedUser;
+		}
+
 		if (!path.startsWith("/")) path = "/" + path;
+
 		Log.debug(String.format("uploadFile: path=%s, contentType=%s, public=%s, user=%s", path, contentType, isPublic, userName));
 
-		if (userName == null)
+		if (authenticatedUser == null)
 			return Response.status(Status.UNAUTHORIZED).entity("Not authenticated").type(MediaType.TEXT_PLAIN).build();
 
 		if (contentType == null)
@@ -323,7 +366,9 @@ public class FilesAPIImpl implements FilesAPI {
 
 		try {
 			UserRegistry registry = _registryUtils.getUserRegistry(userName);
-			String resPath = _config.getUserFilesPath(userName) + path;
+
+			String tenantAwareUsername = MultitenantUtils.getTenantAwareUsername(userName);
+			String resPath = _config.getUserFilesPath(tenantAwareUsername) + path;
 
 			registry.beginTransaction();
 			try {
@@ -365,6 +410,11 @@ public class FilesAPIImpl implements FilesAPI {
 			@DefaultValue("false") @QueryParam("public") boolean delPublic) {
 
 		String userName = request.getRemoteUser();
+
+		if(userName != null){
+			userName = MultitenantUtils.getTenantAwareUsername(userName);
+		}
+
 		if (!path.startsWith("/")) path = "/" + path;
 		Log.debug(String.format("deleteFileOrFolder: path=%s, public=%s, user=%s", path, delPublic, userName));
 

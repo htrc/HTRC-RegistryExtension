@@ -36,6 +36,7 @@ import edu.illinois.i3.htrc.registry.api.utils.RegistryUtils;
 import edu.illinois.i3.htrc.registry.api.utils.WorksetUtils;
 import edu.illinois.i3.htrc.registry.entities.workset.Workset;
 import edu.illinois.i3.htrc.registry.entities.workset.Worksets;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 /**
  * JAX-RS Implementation for {@link WorksetsAPI}
@@ -207,7 +208,14 @@ public class WorksetsAPIImpl implements WorksetsAPI {
 	 * @return The currently authenticated user, or null if not authenticated
 	 */
 	protected String getAuthenticatedUser() {
-		return _request.getRemoteUser();
+		String remoteUser = _request.getRemoteUser();
+
+		if(remoteUser != null){
+			// Extracting user name part from username with tenant (e.g. admin@carbon.super)
+			return MultitenantUtils.getTenantAwareUsername(remoteUser);
+		}
+
+		return null;
 	}
 
 	/**
