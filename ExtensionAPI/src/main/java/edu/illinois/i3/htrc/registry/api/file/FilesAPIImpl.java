@@ -213,7 +213,7 @@ public class FilesAPIImpl implements FilesAPI {
 						resource = registry.get(child);
 					} catch (AuthorizationFailedException afe){
 						Log.warn("getFileOrFolder: Registry authorization failure. This should not happen." +
-								" But latest version of getChildren returns private resources too.");
+								" But latest  Registry version's getChildren returns private resources.");
 						continue;
 					}
 

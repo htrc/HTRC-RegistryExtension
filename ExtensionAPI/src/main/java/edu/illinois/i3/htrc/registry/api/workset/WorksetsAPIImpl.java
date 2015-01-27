@@ -26,6 +26,7 @@ import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
+import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 
 import edu.illinois.i3.htrc.registry.api.HTRCMediaTypes;
@@ -229,7 +230,14 @@ public class WorksetsAPIImpl implements WorksetsAPI {
 	private List<Workset> getUserWorksets(Collection worksetCollection, UserRegistry registry) throws RegistryException {
 		List<Workset> worksets = new ArrayList<Workset>();
 		for (String child : worksetCollection.getChildren()) {
-			Resource resource = registry.get(child);
+			Resource resource;
+            try {
+                resource = registry.get(child);
+            } catch (AuthorizationFailedException afe) {
+                Log.warn("getUserWorksets: Registry authorization failure. This should not happen." +
+                        " But latest Registry version's Collection/getChildren returns private resources.");
+                continue;
+            }
 
 			if (Log.isDebugEnabled())
 				LogUtils.logResource(Log, resource);
