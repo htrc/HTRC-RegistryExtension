@@ -306,7 +306,7 @@ public class FilesAPIImpl implements FilesAPI {
 					Log.debug("Uploaded: " + resPath);
 
 					if (isPublic) {
-						_registryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
+						RegistryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
 						String symlinkPath = publicFilesPath + path + fileName;
 						Log.debug("Creating symlink: " + symlinkPath + " -> " + resPath);
 						registry.createLink(symlinkPath, resPath);
@@ -380,7 +380,7 @@ public class FilesAPIImpl implements FilesAPI {
 				Log.debug("Uploaded: " + resPath);
 
 				if (isPublic) {
-					_registryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
+					RegistryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
 					String symlinkPath = _config.getPublicFilesPath() + path;
 					Log.debug("Creating symlink: " + symlinkPath + " -> " + resPath);
 					registry.createLink(symlinkPath, resPath);
@@ -439,7 +439,7 @@ public class FilesAPIImpl implements FilesAPI {
 							try {
 								Log.debug("Removing symlink: " + resPath + " -> " + targetPath);
 								registry.removeLink(resPath);
-								_registryUtils.clearEveryone(targetPath, registry, ActionConstants.GET);
+								RegistryUtils.clearEveryone(targetPath, registry, ActionConstants.GET);
 								registry.commitTransaction();
 								return Response.noContent().build();
 							}

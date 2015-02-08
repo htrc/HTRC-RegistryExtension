@@ -109,7 +109,7 @@ public class RegistryExtension implements ServletContextListener {
 			}
 		}
 
-		_registryUtils.authorizeEveryone(_config.getPublicPath(), registry,
+		RegistryUtils.authorizeEveryone(_config.getPublicPath(), registry,
 				ActionConstants.GET, ActionConstants.PUT, ActionConstants.DELETE);
 	}
 

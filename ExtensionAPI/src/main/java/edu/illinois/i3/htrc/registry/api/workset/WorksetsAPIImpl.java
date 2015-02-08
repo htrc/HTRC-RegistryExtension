@@ -159,9 +159,9 @@ public class WorksetsAPIImpl implements WorksetsAPI {
 				workset.setMetadata(WorksetUtils.updateResourceCommunityMeta(resource, workset.getMetadata(), registry, _registryUtils));
 
 				if (isPublic)
-					_registryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
+					RegistryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
 				else
-					_registryUtils.denyEveryone(resPath, registry, ActionConstants.GET);
+					RegistryUtils.denyEveryone(resPath, registry, ActionConstants.GET);
 
 				registry.commitTransaction();
 			}
