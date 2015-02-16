@@ -42,17 +42,12 @@ import edu.illinois.i3.htrc.registry.entities.workset.WorksetMeta;
 public class WorksetUtils {
 
 	private static final Log Log = LogFactory.getLog(WorksetUtils.class);
-	private static final Marshaller VolumeMarshaller;
-	private static final Unmarshaller VolumeUnmarshaller;
+  private static final JAXBContext jaxbContext;
     private static final Pattern IllegalWorksetCharactersPattern;
 
     static {
     	try {
-			JAXBContext context = JAXBContext.newInstance(Volumes.class, Volume.class);
-			VolumeMarshaller = context.createMarshaller();
-			VolumeMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			VolumeMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-			VolumeUnmarshaller = context.createUnmarshaller();
+			jaxbContext = JAXBContext.newInstance(Volumes.class, Volume.class);
 			IllegalWorksetCharactersPattern = Pattern.compile(Constants.ILLEGAL_CHARACTERS_FOR_PATH);
     	}
     	catch (Exception e) {
@@ -236,7 +231,7 @@ public class WorksetUtils {
 	 */
 	public static InputStream createWorksetContentStream(List<Volume> volumes) throws JAXBException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		VolumeMarshaller.marshal(new Volumes(volumes), baos);
+		createMarshaller().marshal(new Volumes(volumes), baos);
 
 		return new ByteArrayInputStream(baos.toByteArray());
 	}
@@ -251,7 +246,7 @@ public class WorksetUtils {
 	 */
 	public static Volumes getWorksetVolumesFromResource(Resource resource) throws JAXBException, RegistryException {
 		return resource.getContent() != null ?
-				(Volumes)VolumeUnmarshaller.unmarshal(resource.getContentStream()) : null;
+				(Volumes)createUnmarshaller().unmarshal(resource.getContentStream()) : null;
 	}
 
 	/**
@@ -268,4 +263,24 @@ public class WorksetUtils {
 			return null;
 		}
 	}
+
+  private static Marshaller createMarshaller(){
+    try {
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+      marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+
+      return marshaller;
+    } catch (JAXBException e) {
+      throw  new RuntimeException("Cannot create marshaller.", e);
+    }
+  }
+
+  private static Unmarshaller createUnmarshaller(){
+    try{
+      return jaxbContext.createUnmarshaller();
+    } catch (JAXBException e) {
+      throw  new RuntimeException("Cannot create unmarshaller.", e);
+    }
+  }
 }
