@@ -98,7 +98,7 @@
 		<jaxrs:extensionMappings>
 			<entry key="xml" value="application/xml" />
 			<entry key="json" value="application/json" />
-      <entry key="csv" value="text/csv" />
+			<entry key="csv" value="text/csv" />
 			<entry key="txt" value="text/plain" />
 		</jaxrs:extensionMappings>
 	</jaxrs:server>
