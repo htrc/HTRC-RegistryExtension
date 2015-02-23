@@ -8,30 +8,11 @@
          http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
          http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
+	<import resource="cxf-shared.xml"/>
+
     <!-- WORKSETS -->
 
 	<bean id="worksetPublicAPIService" class="edu.illinois.i3.htrc.registry.api.workset.PublicWorksetsAPIImpl" />
-
-	<bean id="jaxbWorksetProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-		<property name="singleJaxbContext" value="true" />
-        <property name="produceMediaTypes" ref="xmlWorksetProduceTypes" />
-        <property name="consumeMediaTypes" ref="xmlWorksetConsumeTypes" />
-		<property name="marshallerProperties" ref="propertiesMap" />
-		<!-- <property name="namespacePrefixes" ref="xmlWorksetNamespaceMap" /> -->
-		<property name="extraClass" ref="extraWorksetClassesList" />
-	</bean>
-
-    <bean id="jsonWorksetProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
-        <property name="singleJaxbContext" value="true" />
-        <property name="produceMediaTypes" ref="jsonWorksetProduceTypes" />
-        <property name="consumeMediaTypes" ref="jsonWorksetConsumeTypes" />
-        <property name="namespaceMap" ref="jsonWorksetNamespaceMap"/>
-        <property name="extraClass" ref="extraWorksetClassesList" />
-        <!-- <property name="serializeAsArray" value="true" /> -->
-        <!-- <property name="arrayKeys" ref="jsonWorksetKeys" /> -->
-        <!-- <property name="dropRootElement" value="true" /> -->
-        <!-- <property name="supportUnwrapped" value="true" /> -->
-    </bean>
 
 	<jaxrs:server id="worksets" address="/worksets">
 		<jaxrs:features>
@@ -45,6 +26,7 @@
 		<jaxrs:providers>
 			<ref bean="jaxbWorksetProvider" />
 			<ref bean="jsonWorksetProvider" />
+			<ref bean="htrcEntityProvider" />
 		</jaxrs:providers>
 
 		<jaxrs:schemaLocations>
@@ -60,48 +42,5 @@
 			<entry key="txt" value="text/plain" />
 		</jaxrs:extensionMappings>
 	</jaxrs:server>
-
-	<util:map id="propertiesMap">
-		<entry key="jaxb.formatted.output">
-			<value type="java.lang.Boolean">true</value>
-		</entry>
-	</util:map>
-
-    <util:list id="extraWorksetClassesList">
-       <value>edu.illinois.i3.htrc.registry.entities.workset.Worksets</value>
-       <value>edu.illinois.i3.htrc.registry.entities.workset.Volumes</value>
-       <value>edu.illinois.i3.htrc.registry.entities.workset.Tags</value>
-    </util:list>
-
-    <util:list id="xmlWorksetProduceTypes">
-       <value>application/xml</value>
-       <value>application/vnd.htrc-workset+xml</value>
-       <value>application/vnd.htrc-volume+xml</value>
-       <value>application/vnd.htrc-tag+xml</value>
-    </util:list>
-
-	<util:list id="jsonWorksetProduceTypes">
-	   <value>application/json</value>
-	   <value>application/vnd.htrc-workset+json</value>
-       <value>application/vnd.htrc-volume+json</value>
-       <value>application/vnd.htrc-tag+json</value>
-	</util:list>
-
-    <!--
-	<util:list id="jsonWorksetKeys">
-	   <value>tags</value>
-	   <value>comments</value>
-	</util:list>
-    -->
-
-    <!--
-    <util:map id="xmlWorksetNamespaceMap" map-class="java.util.Hashtable">
-        <entry key="http://registry.htrc.i3.illinois.edu/entities/workset" value="w" />
-    </util:map>
-    -->
-
-	<util:map id="jsonWorksetNamespaceMap" map-class="java.util.Hashtable">
-		<entry key="http://registry.htrc.i3.illinois.edu/entities/workset" value="" />
-	</util:map>
 
 </beans>
