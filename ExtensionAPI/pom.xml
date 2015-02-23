@@ -31,15 +31,9 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${cxf.version}</version>
-        </dependency> -->
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-client</artifactId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${cxf.version}</version>
         </dependency>
 
@@ -47,12 +41,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
             <version>${cxf.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
         </dependency>
 
         <dependency>
@@ -84,7 +72,6 @@
             <groupId>edu.indiana.d2i.htrc</groupId>
             <artifactId>oauth2-servletfilter</artifactId>
             <version>2.0-SNAPSHOT</version>
-
 
             <exclusions>
                 <exclusion>
