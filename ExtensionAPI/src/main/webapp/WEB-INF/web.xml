@@ -8,14 +8,6 @@
 
     <!--
     <context-param>
-        <description>The CXF servlet configuration file</description>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>WEB-INF/cxf-servlet.xml</param-value>
-    </context-param>
-    -->
-
-    <!--
-    <context-param>
         <description>The Registry Extension configuration file</description>
         <param-name>htrcConfig</param-name>
         <param-value>WEB-INF/htrc.properties</param-value>
@@ -49,18 +41,39 @@
 
 	<filter-mapping>
 	    <filter-name>OAuth2Filter</filter-name>
-	    <servlet-name>CXFServlet</servlet-name>
+	    <servlet-name>CXFServletPrivate</servlet-name>
 	</filter-mapping>
 
     <servlet>
-        <servlet-name>CXFServlet</servlet-name>
+        <servlet-name>CXFServletPrivate</servlet-name>
         <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
+        <description>RegExt Private API</description>
+        <init-param>
+        	<param-name>config-location</param-name>
+        	<param-value>WEB-INF/cxf-servlet-private.xml</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
+        <servlet-name>CXFServletPublic</servlet-name>
+        <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+        <description>RegExt Public API</description>
+        <init-param>
+        	<param-name>config-location</param-name>
+        	<param-value>WEB-INF/cxf-servlet-public.xml</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>CXFServlet</servlet-name>
+        <servlet-name>CXFServletPrivate</servlet-name>
         <url-pattern>${api.ctx.base}/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>CXFServletPublic</servlet-name>
+        <url-pattern>/public/*</url-pattern>
     </servlet-mapping>
 
     <session-config>
