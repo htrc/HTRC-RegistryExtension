@@ -31,9 +31,15 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
+        <!-- <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${cxf.version}</version>
+        </dependency> -->
+
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
             <version>${cxf.version}</version>
         </dependency>
 
@@ -46,7 +52,7 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0-m15</version>
+            <version>2.0.1</version>
         </dependency>
 
         <dependency>
@@ -161,7 +167,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <CApp.type>webapp/jaxws</CApp.type>
-        <cxf.version>2.7.14</cxf.version>
+        <cxf.version>3.0.3</cxf.version>
         <springframework.version>4.1.4.RELEASE</springframework.version>
         <webapp.filter>development</webapp.filter>
         <public.svn.root>svn://svn.code.sf.net/p/htrc/code</public.svn.root>
