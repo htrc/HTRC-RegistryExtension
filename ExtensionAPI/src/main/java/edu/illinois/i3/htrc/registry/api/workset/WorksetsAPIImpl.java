@@ -211,12 +211,10 @@ public class WorksetsAPIImpl implements WorksetsAPI {
 	protected String getAuthenticatedUser() {
 		String remoteUser = _request.getRemoteUser();
 
-		if(remoteUser != null){
-			// Extracting user name part from username with tenant (e.g. admin@carbon.super)
-			return MultitenantUtils.getTenantAwareUsername(remoteUser);
-		}
-
-		return null;
+		return (remoteUser != null) ?
+			// Extract user name part from username with tenant (e.g. admin@carbon.super)
+			MultitenantUtils.getTenantAwareUsername(remoteUser) :
+			null;
 	}
 
 	/**
@@ -234,8 +232,8 @@ public class WorksetsAPIImpl implements WorksetsAPI {
             try {
                 resource = registry.get(child);
             } catch (AuthorizationFailedException afe) {
-                Log.warn("getUserWorksets: Registry authorization failure. This should not happen." +
-                        " But latest Registry version's Collection/getChildren returns private resources.");
+                Log.warn(String.format("getUserWorksets: Registry authorization failure for '%s'. This should not happen." +
+                        " But latest Registry version's Collection/getChildren returns private resources.", child));
                 continue;
             }
 
