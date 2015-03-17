@@ -394,6 +394,13 @@
         </profile>
 
         <profile>
+            <id>development</id>
+            <properties>
+                <webapp.filter>development</webapp.filter>
+            </properties>
+        </profile>
+
+        <profile>
             <id>local</id>
             <properties>
                 <webapp.filter>local</webapp.filter>
