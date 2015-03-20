@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://wso2.org/projects/as/classloading" xmlns:c="http://wso2.org/projects/as/classloading">
+    <xs:element name="Classloading">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="c:ParentFirst"/>
+                <xs:element ref="c:Environments"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ParentFirst" type="xs:boolean"/>
+    <xs:element name="Environments" type="xs:NCName"/>
+</xs:schema>

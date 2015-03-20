@@ -16,7 +16,8 @@
 			<element name="author" type="string" minOccurs="0" />
 			<element name="rating" minOccurs="0">
                 <simpleType>
-                    <restriction base="nonNegativeInteger">
+                    <restriction base="int">
+                        <minInclusive value="0" />
                         <maxInclusive value="5" />
                     </restriction>
                 </simpleType>

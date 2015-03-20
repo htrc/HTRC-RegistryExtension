@@ -1,15 +1,54 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.illinois.i3.htrc.registry</groupId>
     <artifactId>ExtensionAPI</artifactId>
     <version>1.2.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <CApp.type>webapp/jaxws</CApp.type>
+        <cxf.version>2.7.6</cxf.version>
+        <java.version>1.7</java.version>
+        <servlet.version>2.5</servlet.version>
+        <webapp.filter>development</webapp.filter>
+        <github.global.server>github</github.global.server>
+        <public.code.repo>https://github.com/htrc</public.code.repo>
+        <developer.code.repo>https://github.com/htrc</developer.code.repo>
+        <github.repo.name>HTRC-RegistryExtension</github.repo.name>
+        <fisheye.changelog.root>http://fisheye.htrc.illinois.edu/changelog</fisheye.changelog.root>
+    </properties>
+
     <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>${servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${cxf.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-providers</artifactId>
+            <version>${cxf.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.governance.api</artifactId>
@@ -18,103 +57,21 @@
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.registry.api</artifactId>
-            <version>4.3.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.registry.core</artifactId>
-            <version>4.3.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-extension-providers</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.jettison</groupId>
-            <artifactId>jettison</artifactId>
-            <version>1.3.7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${springframework.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${springframework.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
+            <groupId>edu.indiana.d2i.htrc</groupId>
+            <artifactId>oauth2-servletfilter</artifactId>
+            <version>2.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>edu.indiana.d2i.htrc</groupId>
-            <artifactId>oauth2-servletfilter</artifactId>
-            <version>2.0-SNAPSHOT</version>
-
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-plugin-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.amber.wso2</groupId>
-                    <artifactId>amber</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.axis2.wso2</groupId>
-                    <artifactId>axis2</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.axis2.wso2</groupId>
-                    <artifactId>axis2-client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.gdata.wso2</groupId>
-                    <artifactId>gdata-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.common.wso2</groupId>
-                    <artifactId>google-collect</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.ws.commons.axiom.wso2</groupId>
-                    <artifactId>axiom</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.wso2.carbon</groupId>
-                    <artifactId>org.wso2.carbon.utils</artifactId>
-                </exclusion>
-                <!-- <exclusion>
-                    <groupId>org.wso2.carbon</groupId>
-                    <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
-                </exclusion> -->
-            </exclusions>
+            <artifactId>htrc-auditor</artifactId>
+            <version>0.0.1</version>
         </dependency>
 
         <dependency>
@@ -128,41 +85,7 @@
             <artifactId>super-csv</artifactId>
             <version>2.2.1</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.8.17</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.integration.framework</artifactId>
-            <version>4.3.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.webapp.mgt.stub</artifactId>
-            <version>4.2.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <CApp.type>webapp/jaxws</CApp.type>
-        <cxf.version>3.0.3</cxf.version>
-        <springframework.version>4.1.4.RELEASE</springframework.version>
-        <webapp.filter>development</webapp.filter>
-        <github.global.server>github</github.global.server>
-        <public.code.repo>https://github.com/htrc</public.code.repo>
-        <developer.code.repo>https://github.com/htrc</developer.code.repo>
-        <github.repo.name>${project.name}</github.repo.name>
-        <fisheye.changelog.root>http://fisheye.htrc.illinois.edu/changelog</fisheye.changelog.root>
-    </properties>
 
     <!-- Build Settings -->
     <build>
@@ -172,8 +95,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
 
@@ -192,19 +115,18 @@
                             <schemaDirectory>${basedir}/src/main/resources/schemas</schemaDirectory>
                             <removeOldOutput>false</removeOldOutput>
                             <episode>false</episode>
-                            <!-- <strict>false</strict> -->
                             <extension>true</extension>
                             <args>
                                 <arg>-no-header</arg>
                                 <arg>-Xxew</arg>
                                 <arg>-Xxew:instantiate lazy</arg>
-                                <arg>-Xxew:delete</arg>
+                                <arg>-Xxew:control ${basedir}/src/main/resources/schemas/control.txt</arg>
                             </args>
                             <plugins>
                                 <plugin>
                                     <groupId>com.github.jaxb-xew-plugin</groupId>
                                     <artifactId>jaxb-xew-plugin</artifactId>
-                                    <version>1.0</version>
+                                    <version>1.5</version>
                                 </plugin>
                             </plugins>
                         </configuration>
@@ -218,7 +140,7 @@
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <filters>
-                        <filter>src/main/filters/${webapp.filter}.properties</filter>
+                        <filter>${basedir}/src/main/filters/${webapp.filter}.properties</filter>
                     </filters>
                     <packagingExcludes>WEB-INF/lib/log4j*.jar</packagingExcludes>
                 </configuration>
@@ -230,43 +152,28 @@
                 <version>2.9</version>
                 <configuration>
                     <projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
+
+                    <additionalProjectFacets>
+                        <jst.web>${servlet.version}</jst.web>
+                        <wst.jsdt.web>1.0</wst.jsdt.web>
+                        <cxf.core>1.0</cxf.core>
+                        <java>${java.version}</java>
+                        <jpt.jaxb>2.2</jpt.jaxb>
+                        <jst.jaxrs>2.0</jst.jaxrs>
+                    </additionalProjectFacets>
+
+                    <additionalBuildcommands>
+                        <buildcommand>org.eclipse.m2e.core.maven2Builder</buildcommand>
+                    </additionalBuildcommands>
+
+                    <additionalProjectnatures>
+                        <projectnature>org.eclipse.m2e.core.maven2Nature</projectnature>
+                    </additionalProjectnatures>
+
                     <wtpmanifest>true</wtpmanifest>
                     <wtpapplicationxml>true</wtpapplicationxml>
                     <wtpversion>2.0</wtpversion>
                 </configuration>
-            </plugin>
-
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-                    <systemPropertyVariables>
-                        <buildDir>${project.build.directory}</buildDir>
-                        <finalName>${project.build.finalName}</finalName>
-                        <gregPortOffset>100</gregPortOffset>
-                    </systemPropertyVariables>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml </suiteXmlFile>
-                    </suiteXmlFiles>
-                </configuration>
-                <executions>
-			        <execution>
-			            <id>failsafe-integration-test</id>
-			            <phase>integration-test</phase>
-			            <goals>
-			                <goal>integration-test</goal>
-			            </goals>
-			        </execution>
-			        <execution>
-			            <id>failsafe-verify</id>
-			            <phase>verify</phase>
-			            <goals>
-			                <goal>verify</goal>
-			            </goals>
-			        </execution>
-			    </executions>
             </plugin>
 
             <plugin>
@@ -303,6 +210,34 @@
         </plugins>
     </build>
 
+    <!-- Project Information -->
+    <name>ExtensionAPI</name>
+    <description>API for managing HTRC artifacts</description>
+    <url>https://htrc.github.io/${github.repo.name}</url>
+
+    <organization>
+        <name>HathiTrust Research Center</name>
+        <url>http://www.hathitrust.org/htrc</url>
+    </organization>
+
+    <!-- Environment Settings -->
+    <issueManagement>
+        <system>jira</system>
+        <url>https://jira.htrc.illinois.edu/issues/?jql=project%20%3D%20SHARC%20AND%20component%20%3D%20Registry</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>bamboo</system>
+        <url>http://bamboo.htrc.illinois.edu/browse/REG</url>
+    </ciManagement>
+
+    <scm>
+        <connection>scm:git:${public.code.repo}/${github.repo.name}.git</connection>
+        <developerConnection>scm:git:${developer.code.repo}/${github.repo.name}.git</developerConnection>
+        <url>${fisheye.changelog.root}/${github.repo.name}</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <!-- Reporting -->
     <reporting>
         <plugins>
@@ -327,34 +262,7 @@
         </plugins>
     </reporting>
 
-    <!-- Project Information -->
-    <name>ExtensionAPI</name>
-    <description>API for managing HTRC artifacts</description>
-    <url>https://htrc.github.io/${github.repo.name}</url>
-
-    <organization>
-        <name>HathiTrust Research Center</name>
-        <url>http://www.hathitrust.org/htrc</url>
-    </organization>
-
-    <!-- Environment Settings -->
-    <issueManagement>
-        <system>jira</system>
-        <url>http://jira.htrc.illinois.edu/browse/REG</url>
-    </issueManagement>
-
-    <ciManagement>
-        <system>bamboo</system>
-        <url>http://bamboo.htrc.illinois.edu/browse/REG</url>
-    </ciManagement>
-
-    <scm>
-        <connection>scm:git:${public.code.repo}/${github.repo.name}.git</connection>
-        <developerConnection>scm:git:${developer.code.repo}/${github.repo.name}.git</developerConnection>
-        <url>${fisheye.changelog.root}/${github.repo.name}</url>
-        <tag>HEAD</tag>
-    </scm>
-
+    <!-- Repositories -->
     <repositories>
         <repository>
             <id>nexus</id>

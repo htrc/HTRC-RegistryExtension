@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	xmlns:cxf="http://cxf.apache.org/core" xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="
-         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
-         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+	xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
-	<import resource="cxf-shared.xml"/>
+    <import resource="cxf-shared.xml"/>
 
     <!-- FILES -->
-
     <bean id="fileAPIService" class="edu.illinois.i3.htrc.registry.api.file.FilesAPIImpl" />
 
     <jaxrs:server id="files" address="/files">
@@ -25,14 +20,16 @@
         </jaxrs:providers>
     </jaxrs:server>
 
-    <!-- WORKSETS -->
 
+    <!-- WORKSETS -->
 	<bean id="worksetAPIService" class="edu.illinois.i3.htrc.registry.api.workset.WorksetsAPIImpl" />
 
 	<jaxrs:server id="worksets" address="/worksets">
+		<!--
 		<jaxrs:features>
-			<!-- <cxf:logging/> -->
+			<cxf:logging />
 		</jaxrs:features>
+		-->
 
 		<jaxrs:serviceBeans>
 			<ref bean="worksetAPIService" />
@@ -41,13 +38,12 @@
 		<jaxrs:providers>
 			<ref bean="jaxbWorksetProvider" />
 			<ref bean="jsonWorksetProvider" />
-			<ref bean="htrcEntityProvider" />
 		</jaxrs:providers>
 
 		<jaxrs:schemaLocations>
 			<jaxrs:schemaLocation>WEB-INF/classes/schemas/workset.xsd</jaxrs:schemaLocation>
-            <jaxrs:schemaLocation>WEB-INF/classes/schemas/volume.xsd</jaxrs:schemaLocation>
-            <jaxrs:schemaLocation>WEB-INF/classes/schemas/tag.xsd</jaxrs:schemaLocation>
+			<jaxrs:schemaLocation>WEB-INF/classes/schemas/volume.xsd</jaxrs:schemaLocation>
+			<jaxrs:schemaLocation>WEB-INF/classes/schemas/tag.xsd</jaxrs:schemaLocation>
 		</jaxrs:schemaLocations>
 
 		<jaxrs:extensionMappings>
@@ -57,4 +53,5 @@
 			<entry key="txt" value="text/plain" />
 		</jaxrs:extensionMappings>
 	</jaxrs:server>
+
 </beans>

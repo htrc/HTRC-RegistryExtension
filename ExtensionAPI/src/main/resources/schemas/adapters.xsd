@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://www.w3.org/2001/XMLSchema"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	jaxb:extensionBindingPrefixes="xjc"
 	jaxb:version="2.1">
 
-    <!-- XJC workaround based on http://jaxb.java.net/guide/Customizing_Java_packages.html#Tip__get_rid_of_the_org_w3__2001_xmlschema_package -->
+	<!-- XJC workaround based on http://jaxb.java.net/guide/Customizing_Java_packages.html#Tip__get_rid_of_the_org_w3__2001_xmlschema_package -->
 
-	<annotation>
-		<appinfo>
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:globalBindings fixedAttributeAsConstantProperty="true">
+				<xjc:simple />
+
+				<jaxb:javaType name="java.util.Calendar" xmlType="xs:dateTime"
+					parseMethod="javax.xml.bind.DatatypeConverter.parseDateTime"
+					printMethod="javax.xml.bind.DatatypeConverter.printDateTime" />
+
+				<jaxb:javaType name="java.util.Calendar" xmlType="xs:date"
+					parseMethod="javax.xml.bind.DatatypeConverter.parseDate"
+					printMethod="javax.xml.bind.DatatypeConverter.printDate" />
+			</jaxb:globalBindings>
+
 			<jaxb:schemaBindings>
 				<jaxb:package name="edu.illinois.i3.htrc.registry.utils.adapters" />
 			</jaxb:schemaBindings>
-		</appinfo>
-	</annotation>
+		</xs:appinfo>
+	</xs:annotation>
 
-</schema>
+</xs:schema>

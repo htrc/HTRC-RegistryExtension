@@ -231,7 +231,7 @@ public class WorksetUtils {
 	 */
 	public static InputStream createWorksetContentStream(List<Volume> volumes) throws JAXBException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		createMarshaller().marshal(new Volumes(volumes), baos);
+		createMarshaller().marshal(volumes, baos);
 
 		return new ByteArrayInputStream(baos.toByteArray());
 	}
