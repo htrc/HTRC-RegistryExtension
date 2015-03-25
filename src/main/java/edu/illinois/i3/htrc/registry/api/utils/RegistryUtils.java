@@ -27,7 +27,6 @@ public class RegistryUtils {
 	 *
 	 * @param registryService The {@link RegistryService} instance
 	 * @param realmService The {@link RealmService} instance
-	 * @throws RegistryException Thrown if a registry error occurs
 	 */
 	public RegistryUtils(RegistryService registryService, RealmService realmService) {
 		_registryService = registryService;

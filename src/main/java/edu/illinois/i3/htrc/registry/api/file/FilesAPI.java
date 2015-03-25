@@ -105,6 +105,7 @@ public interface FilesAPI {
 	 * @param request Injected HttpServletRequest
 	 * @param folderPath The path to the folder to upload to
 	 * @param isPublic True to upload to the public file space, False otherwise
+     * @param user The user on behalf of whom to upload the files
 	 * @param attachments The list of files to upload
 	 * @return 204 if successful, error otherwise
 	 */
@@ -125,6 +126,7 @@ public interface FilesAPI {
 	 * @param contentType The file's media type
 	 * @param filePath The path to upload to
 	 * @param isPublic True to upload to the public file space, False otherwise
+     * @param user The user on behalf of whom to upload the files
 	 * @param fileStream The file content stream
 	 * @return 204 if successful, error otherwise
 	 */
