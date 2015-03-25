@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+
+	<display-name>HTRC Extension API ${version}</display-name>
+
+    <!--
+    <context-param>
+        <description>The Registry Extension configuration file</description>
+        <param-name>htrcConfig</param-name>
+        <param-value>WEB-INF/htrc.properties</param-value>
+    </context-param>
+    -->
+
+	<listener>
+		<listener-class>edu.illinois.i3.htrc.registry.api.RegistryExtension</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>OAuth2Filter</filter-name>
+		<filter-class>edu.indiana.d2i.htrc.oauth2.filter.OAuth2Filter</filter-class>
+		<init-param>
+			<param-name>oauth2.provider.url</param-name>
+			<param-value>${oauth2.provider.url}</param-value>
+		</init-param>
+		<init-param>
+			<param-name>oauth2.provider.user</param-name>
+			<param-value>${oauth2.provider.user}</param-value>
+		</init-param>
+		<init-param>
+			<param-name>oauth2.provider.password</param-name>
+			<param-value>${oauth2.provider.password}</param-value>
+		</init-param>
+		<init-param>
+			<param-name>auditor.class</param-name>
+			<param-value>edu.indiana.d2i.htrc.audit.Log4jAuditor</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>OAuth2Filter</filter-name>
+		<servlet-name>CXFServletPrivate</servlet-name>
+	</filter-mapping>
+
+	<servlet>
+		<description>RegExt Private API</description>
+		<servlet-name>CXFServletPrivate</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+		<init-param>
+			<param-name>config-location</param-name>
+			<param-value>WEB-INF/cxf-servlet-private.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<description>RegExt Public API</description>
+		<servlet-name>CXFServletPublic</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+		<init-param>
+			<param-name>config-location</param-name>
+			<param-value>WEB-INF/cxf-servlet-public.xml</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CXFServletPrivate</servlet-name>
+		<url-pattern>${api.ctx.base}/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>CXFServletPublic</servlet-name>
+		<url-pattern>${public.api.ctx.base}/*</url-pattern>
+	</servlet-mapping>
+
+	<session-config>
+		<session-timeout>${session.timeout}</session-timeout>
+	</session-config>
+</web-app>

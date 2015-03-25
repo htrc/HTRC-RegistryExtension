@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+
+    <bean id="jaxbFileProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+        <property name="singleJaxbContext" value="true" />
+        <property name="produceMediaTypes" ref="xmlFileProduceTypes" />
+        <property name="marshallerProperties" ref="jaxbPropertiesMap" />
+    </bean>
+
+    <bean id="jsonFileProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+        <property name="singleJaxbContext" value="true" />
+        <property name="produceMediaTypes" ref="jsonFileProduceTypes" />
+        <property name="ignoreNamespaces" value="true" />
+    </bean>
+
+    <util:list id="xmlFileProduceTypes">
+       <value>application/xml</value>
+       <value>application/vnd.htrc-entry+xml</value>
+    </util:list>
+
+    <util:list id="jsonFileProduceTypes">
+       <value>application/json</value>
+       <value>application/vnd.htrc-entry+json</value>
+    </util:list>
+
+    <bean id="jaxbWorksetProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+        <property name="singleJaxbContext" value="true" />
+        <property name="produceMediaTypes" ref="xmlWorksetProduceTypes" />
+        <property name="consumeMediaTypes" ref="xmlWorksetConsumeTypes" />
+        <property name="marshallerProperties" ref="jaxbPropertiesMap" />
+    </bean>
+
+    <bean id="jsonWorksetProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+        <property name="singleJaxbContext" value="true" />
+        <property name="produceMediaTypes" ref="jsonWorksetProduceTypes" />
+        <property name="consumeMediaTypes" ref="jsonWorksetConsumeTypes" />
+        <property name="ignoreNamespaces" value="true" />
+        <!-- <property name="dropCollectionWrapperElement" value="true" /> -->
+        <!-- <property name="dropRootElement" value="true" /> -->
+        <!-- <property name="supportUnwrapped" value="true" /> -->
+        <!-- <property name="serializeAsArray" value="true" /> -->
+        <!-- <property name="arrayKeys" ref="jsonWorksetKeys" /> -->
+    </bean>
+
+    <util:list id="xmlWorksetProduceTypes">
+        <value>application/xml</value>
+        <value>application/vnd.htrc-workset+xml</value>
+        <value>application/vnd.htrc-volume+xml</value>
+        <value>application/vnd.htrc-tag+xml</value>
+    </util:list>
+
+    <util:list id="jsonWorksetProduceTypes">
+        <value>application/json</value>
+        <value>application/vnd.htrc-workset+json</value>
+        <value>application/vnd.htrc-volume+json</value>
+        <value>application/vnd.htrc-tag+json</value>
+    </util:list>
+
+    <util:list id="xmlWorksetConsumeTypes">
+        <value>application/vnd.htrc-workset+xml</value>
+        <value>application/vnd.htrc-volume+xml</value>
+    </util:list>
+
+    <util:list id="jsonWorksetConsumeTypes">
+        <value>application/vnd.htrc-workset+json</value>
+        <value>application/vnd.htrc-volume+json</value>
+    </util:list>
+
+    <util:map id="jaxbPropertiesMap">
+        <entry key="jaxb.formatted.output">
+            <value type="java.lang.Boolean">true</value>
+        </entry>
+    </util:map>
+
+    <!--
+    <util:list id="jsonWorksetKeys">
+       <value>tags</value>
+       <value>comments</value>
+       <value>volumes</value>
+    </util:list>
+    -->
+</beans>
