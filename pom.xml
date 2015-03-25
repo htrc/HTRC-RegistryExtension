@@ -200,6 +200,9 @@
                         <version>1.9.2</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <scmCommentPrefix>*release*:&nbsp;</scmCommentPrefix>
+                </configuration>
             </plugin>
 
             <plugin>
