@@ -50,7 +50,7 @@ public interface VolumesAPI {
 	 * GET: Retrieve the workset volumes as XML or JSON
 	 *
 	 * @param author The workset author, or null to use current user
-	 * @return
+	 * @return The workset volumes
 	 */
 	@GET
 	public Response getVolumes(@QueryParam("author") String author);
