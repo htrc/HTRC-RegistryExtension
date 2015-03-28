@@ -229,7 +229,9 @@ public class WorksetUtils {
 	 * @return The {@link InputStream} containing the serialized volumes
 	 * @throws JAXBException Thrown if a serialization error occurs
 	 */
-	public static InputStream createWorksetContentStream(List<Volume> volumes) throws JAXBException {
+	public static InputStream createWorksetContentStream(List<Volume> volumesList) throws JAXBException {
+		Volumes volumes = new Volumes();
+		volumes.getVolumes().addAll(volumesList);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		createMarshaller().marshal(volumes, baos);
 
