@@ -155,7 +155,6 @@
                     <filters>
                         <filter>${basedir}/src/main/filters/${webapp.filter}.properties</filter>
                     </filters>
-                    <packagingExcludes>WEB-INF/lib/log4j*.jar</packagingExcludes>
                 </configuration>
             </plugin>
 
@@ -305,16 +304,23 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>development</id>
             <properties>
-                <webapp.filter>release</webapp.filter>
+                <webapp.filter>development</webapp.filter>
             </properties>
         </profile>
 
         <profile>
-            <id>development</id>
+            <id>production</id>
             <properties>
-                <webapp.filter>development</webapp.filter>
+                <webapp.filter>production</webapp.filter>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>sandbox</id>
+            <properties>
+                <webapp.filter>sandbox</webapp.filter>
             </properties>
         </profile>
 
