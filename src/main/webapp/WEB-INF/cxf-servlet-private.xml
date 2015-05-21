@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+    xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
     <import resource="cxf-shared.xml"/>
 
@@ -22,36 +22,40 @@
 
 
     <!-- WORKSETS -->
-	<bean id="worksetAPIService" class="edu.illinois.i3.htrc.registry.api.workset.WorksetsAPIImpl" />
+    <bean id="worksetAPIService" class="edu.illinois.i3.htrc.registry.api.workset.WorksetsAPIImpl" />
 
-	<jaxrs:server id="worksets" address="/worksets">
-		<!--
-		<jaxrs:features>
-			<cxf:logging />
-		</jaxrs:features>
-		-->
+    <jaxrs:server id="worksets" address="/worksets">
+        <!--
+        <jaxrs:features>
+            <cxf:logging />
+        </jaxrs:features>
+        -->
 
-		<jaxrs:serviceBeans>
-			<ref bean="worksetAPIService" />
-		</jaxrs:serviceBeans>
+        <!-- <jaxrs:properties>
+            <entry key="org.apache.cxf.stax.maxChildElements" value="15000000"/>
+        </jaxrs:properties> -->
 
-		<jaxrs:providers>
-			<ref bean="jaxbWorksetProvider" />
-			<ref bean="jsonWorksetProvider" />
-		</jaxrs:providers>
+        <jaxrs:serviceBeans>
+            <ref bean="worksetAPIService" />
+        </jaxrs:serviceBeans>
 
-		<jaxrs:schemaLocations>
-			<jaxrs:schemaLocation>WEB-INF/classes/schemas/workset.xsd</jaxrs:schemaLocation>
-			<jaxrs:schemaLocation>WEB-INF/classes/schemas/volume.xsd</jaxrs:schemaLocation>
-			<jaxrs:schemaLocation>WEB-INF/classes/schemas/tag.xsd</jaxrs:schemaLocation>
-		</jaxrs:schemaLocations>
+        <jaxrs:providers>
+            <ref bean="jaxbWorksetProvider" />
+            <ref bean="jsonWorksetProvider" />
+        </jaxrs:providers>
 
-		<jaxrs:extensionMappings>
-			<entry key="xml" value="application/xml" />
-			<entry key="json" value="application/json" />
-			<entry key="csv" value="text/csv" />
-			<entry key="txt" value="text/plain" />
-		</jaxrs:extensionMappings>
-	</jaxrs:server>
+        <jaxrs:schemaLocations>
+            <jaxrs:schemaLocation>WEB-INF/classes/schemas/workset.xsd</jaxrs:schemaLocation>
+            <jaxrs:schemaLocation>WEB-INF/classes/schemas/volume.xsd</jaxrs:schemaLocation>
+            <jaxrs:schemaLocation>WEB-INF/classes/schemas/tag.xsd</jaxrs:schemaLocation>
+        </jaxrs:schemaLocations>
+
+        <jaxrs:extensionMappings>
+            <entry key="xml" value="application/xml" />
+            <entry key="json" value="application/json" />
+            <entry key="csv" value="text/csv" />
+            <entry key="txt" value="text/plain" />
+        </jaxrs:extensionMappings>
+    </jaxrs:server>
 
 </beans>
