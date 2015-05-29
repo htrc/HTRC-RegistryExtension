@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.illinois.i3.htrc.registry</groupId>
     <artifactId>ExtensionAPI</artifactId>
-    <version>1.2.2</version>
+    <version>1.3.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <properties>
@@ -155,7 +155,6 @@
                     <filters>
                         <filter>${basedir}/src/main/filters/${webapp.filter}.properties</filter>
                     </filters>
-                    <packagingExcludes>WEB-INF/lib/log4j*.jar</packagingExcludes>
                 </configuration>
             </plugin>
 
@@ -305,16 +304,23 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>development</id>
             <properties>
-                <webapp.filter>release</webapp.filter>
+                <webapp.filter>development</webapp.filter>
             </properties>
         </profile>
 
         <profile>
-            <id>development</id>
+            <id>production</id>
             <properties>
-                <webapp.filter>development</webapp.filter>
+                <webapp.filter>production</webapp.filter>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>sandbox</id>
+            <properties>
+                <webapp.filter>sandbox</webapp.filter>
             </properties>
         </profile>
 
