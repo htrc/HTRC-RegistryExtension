@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This schema added 7 July 2015 by twc to support option of relying on RDF workset descriptions -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://registry.htrc.i3.illinois.edu/entities/workset"
+    xmlns:tns="http://registry.htrc.i3.illinois.edu/entities/workset"
+    elementFormDefault="qualified">
+
+    <complexType name="ExternalWorkset">
+        <sequence>
+            <element name="getVolsQuery" type="anyURI"/>
+            <element name="sparqlEndPoint" type="anyURI"/>
+            <element name="graphIRI" type="anyURI"/>
+        </sequence>
+    </complexType>
+
+    <element name="externalWorkset" type="tns:ExternalWorkset" />
+
+</schema>

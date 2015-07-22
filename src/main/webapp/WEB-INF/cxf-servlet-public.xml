@@ -29,6 +29,7 @@
             <jaxrs:schemaLocation>WEB-INF/classes/schemas/workset.xsd</jaxrs:schemaLocation>
             <jaxrs:schemaLocation>WEB-INF/classes/schemas/volume.xsd</jaxrs:schemaLocation>
             <jaxrs:schemaLocation>WEB-INF/classes/schemas/tag.xsd</jaxrs:schemaLocation>
+            <jaxrs:schemaLocation>WEB-INF/classes/schemas/externalWorkset.xsd</jaxrs:schemaLocation>
         </jaxrs:schemaLocations>
 
         <jaxrs:extensionMappings>

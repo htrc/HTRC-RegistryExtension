@@ -1,0 +1,1 @@
+- use wso2is deployment with registry addons instead of greg deployment for testing in src/test/resources

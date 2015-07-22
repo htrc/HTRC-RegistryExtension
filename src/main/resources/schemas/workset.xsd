@@ -7,6 +7,7 @@
     <include schemaLocation="comment.xsd" />
     <include schemaLocation="tag.xsd" />
     <include schemaLocation="volume.xsd" />
+	<include schemaLocation="externalWorkset.xsd" />
 
 	<complexType name="WorksetMeta">
 		<sequence>
@@ -33,9 +34,13 @@
 	</complexType>
 
 	<complexType name="WorksetContent">
-		<sequence>
+		<choice>
 			<element ref="tns:volumes" />
-		</sequence>
+			<element ref="tns:externalWorkset" />
+			<!-- option to allow choice of externalWorkset (defined in separate XSD files) as an alternative to list of volumes added 9 July 2015 by twc
+				 to allow pointer to an RDF description of a Workset, e.g., initially as a way to support inclusion of non-HT content in the workset  
+			-->
+		</choice>
 	</complexType>
 
 	<complexType name="Workset">
@@ -43,6 +48,13 @@
 			<element name="metadata" type="tns:WorksetMeta" />
 			<element name="content" type="tns:WorksetContent" minOccurs="0" />
 		</sequence>
+		<attribute name="worksetClass" type="int" use="optional" />
+		<!-- worksetClass attribute added 9 July 2015 by twc
+				 value of this attribute is always an integer and is meant to matched bitwise to corresponding algorithm attribute, such that
+				 if the 1 bit is set then the workset contains HT Volumes only and may be consumed by algorithms that can work on HT Volumes;
+				 if the 2 bit is set then the workset contains both HT and External Volumes and may be consumed by algorithm that can consume both;
+				 Future classes of workset, e.g., having non-volume granularity, tbd bits, e.g. if the 4 bit is set the workset contians subvolume resources
+			-->
 	</complexType>
 
 	<complexType name="Worksets">
