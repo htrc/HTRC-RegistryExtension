@@ -5,5 +5,4 @@ edu.illinois.i3.htrc.registry.api.utils
 edu.illinois.i3.htrc.registry.api.workset
 edu.illinois.i3.htrc.registry.entities.file
 edu.illinois.i3.htrc.registry.entities.workset
-edu.illinois.i3.htrc.registry.model.security
 org.w3._2001.xmlschema
