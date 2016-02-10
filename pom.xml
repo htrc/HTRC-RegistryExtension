@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.illinois.i3.htrc.registry</groupId>
     <artifactId>ExtensionAPI</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <properties>
@@ -13,10 +13,9 @@
         <servlet.version>2.5</servlet.version>
         <webapp.filter>development</webapp.filter>
         <github.global.server>github</github.global.server>
-        <public.code.repo>https://github.com/htrc</public.code.repo>
-        <developer.code.repo>https://github.com/htrc</developer.code.repo>
+        <public.code.repo>git://github.com/htrc</public.code.repo>
+        <developer.code.repo>git@github.com:htrc</developer.code.repo>
         <github.repo.name>HTRC-RegistryExtension</github.repo.name>
-        <fisheye.changelog.root>http://fisheye.htrc.illinois.edu/changelog</fisheye.changelog.root>
     </properties>
 
     <dependencies>
@@ -148,6 +147,25 @@
             </plugin>
 
             <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                         </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <gitDescribe>
+                        <dirty>-SNAPSHOT</dirty>
+                    </gitDescribe>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
@@ -155,6 +173,15 @@
                     <filters>
                         <filter>${basedir}/src/main/filters/${webapp.filter}.properties</filter>
                     </filters>
+                    <archive>
+                        <manifestEntries>
+                            <Git-Sha>${git.commit.id}</Git-Sha>
+                            <Git-Branch>${git.branch}</Git-Branch>
+                            <Git-Version>${git.commit.id.describe}</Git-Version>
+                            <Git-Dirty>${git.dirty}</Git-Dirty>
+                            <Build-Date>${git.build.time}</Build-Date>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
 
@@ -191,9 +218,16 @@
             <plugin>
                 <groupId>external.atlassian.jgitflow</groupId>
                 <artifactId>jgitflow-maven-plugin</artifactId>
-                <version>1.0-m4.3</version>
+                <version>1.0-m5.1</version>
                 <configuration>
                     <!-- see https://bitbucket.org/atlassian/jgit-flow/wiki/goals.wiki for configuration options -->
+                    <pushFeatures>true</pushFeatures>
+                    <pushReleases>true</pushReleases>
+                    <pushHotfixes>true</pushHotfixes>
+                    <noDeploy>true</noDeploy>
+                    <flowInitContext>
+                        <versionTagPrefix>v</versionTagPrefix>
+                    </flowInitContext>
                 </configuration>
             </plugin>
 
@@ -232,7 +266,7 @@
     <!-- Environment Settings -->
     <issueManagement>
         <system>jira</system>
-        <url>https://jira.htrc.illinois.edu/issues/?jql=project%20%3D%20SHARC%20AND%20component%20%3D%20Registry</url>
+        <url>https://jira.htrc.illinois.edu/browse/SHARC</url>
     </issueManagement>
 
     <ciManagement>
@@ -243,7 +277,7 @@
     <scm>
         <connection>scm:git:${public.code.repo}/${github.repo.name}.git</connection>
         <developerConnection>scm:git:${developer.code.repo}/${github.repo.name}.git</developerConnection>
-        <url>${fisheye.changelog.root}/${github.repo.name}</url>
+        <url>https://github.com/htrc/${github.repo.name}</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -253,20 +287,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.8.1</version>
+                <configuration>
+                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-changes-plugin</artifactId>
-                <version>2.11</version>
-                <configuration>
-                    <useJql>true</useJql>
-                </configuration>
             </plugin>
         </plugins>
     </reporting>
@@ -314,13 +344,6 @@
             <id>production</id>
             <properties>
                 <webapp.filter>production</webapp.filter>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>sandbox</id>
-            <properties>
-                <webapp.filter>sandbox</webapp.filter>
             </properties>
         </profile>
 
