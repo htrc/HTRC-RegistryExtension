@@ -225,7 +225,7 @@ public class WorksetUtils {
 	/**
 	 * Serialize a list of volumes to a stream
 	 *
-	 * @param volumes The list of volumes
+	 * @param volumesList The list of volumes
 	 * @return The {@link InputStream} containing the serialized volumes
 	 * @throws JAXBException Thrown if a serialization error occurs
 	 */
