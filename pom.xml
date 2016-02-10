@@ -173,7 +173,8 @@
                     <filters>
                         <filter>${basedir}/src/main/filters/${webapp.filter}.properties</filter>
                     </filters>
-                    <archive>
+		    <packagingExcludes>WEB-INF/lib/log4j*.jar</packagingExcludes>
+		    <archive>
                         <manifestEntries>
                             <Git-Sha>${git.commit.id}</Git-Sha>
                             <Git-Branch>${git.branch}</Git-Branch>
