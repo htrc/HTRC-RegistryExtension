@@ -105,7 +105,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.5.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -115,7 +115,7 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.12.3</version>
+                <version>0.13.1</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -188,36 +188,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
-
-                    <additionalProjectFacets>
-                        <jst.web>${servlet.version}</jst.web>
-                        <wst.jsdt.web>1.0</wst.jsdt.web>
-                        <cxf.core>1.0</cxf.core>
-                        <java>${java.version}</java>
-                        <jpt.jaxb>2.2</jpt.jaxb>
-                        <jst.jaxrs>2.0</jst.jaxrs>
-                    </additionalProjectFacets>
-
-                    <additionalBuildcommands>
-                        <buildcommand>org.eclipse.m2e.core.maven2Builder</buildcommand>
-                    </additionalBuildcommands>
-
-                    <additionalProjectnatures>
-                        <projectnature>org.eclipse.m2e.core.maven2Nature</projectnature>
-                    </additionalProjectnatures>
-
-                    <wtpmanifest>true</wtpmanifest>
-                    <wtpapplicationxml>true</wtpapplicationxml>
-                    <wtpversion>2.0</wtpversion>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>external.atlassian.jgitflow</groupId>
                 <artifactId>jgitflow-maven-plugin</artifactId>
                 <version>1.0-m5.1</version>
@@ -235,7 +205,7 @@
             <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>site-maven-plugin</artifactId>
-                <version>0.11</version>
+                <version>0.12</version>
                 <executions>
                     <execution>
                         <goals>
@@ -297,7 +267,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.1</version>
+                <version>2.10.3</version>
             </plugin>
         </plugins>
     </reporting>
