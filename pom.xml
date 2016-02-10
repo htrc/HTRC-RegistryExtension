@@ -159,6 +159,7 @@
                 </executions>
 
                 <configuration>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
                     <gitDescribe>
                         <dirty>-SNAPSHOT</dirty>
                     </gitDescribe>
@@ -173,8 +174,8 @@
                     <filters>
                         <filter>${basedir}/src/main/filters/${webapp.filter}.properties</filter>
                     </filters>
-		    <packagingExcludes>WEB-INF/lib/log4j*.jar</packagingExcludes>
-		    <archive>
+                    <packagingExcludes>WEB-INF/lib/log4j*.jar</packagingExcludes>
+                    <archive>
                         <manifestEntries>
                             <Git-Sha>${git.commit.id}</Git-Sha>
                             <Git-Branch>${git.branch}</Git-Branch>
