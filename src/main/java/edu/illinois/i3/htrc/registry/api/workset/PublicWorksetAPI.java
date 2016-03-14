@@ -43,6 +43,16 @@ public interface PublicWorksetAPI {
 	public PublicVolumesAPI getPublicVolumesAPI();
 
 	/**
+	 * GET: Retrieve a workset's metadata
+	 *
+	 * @param author The workset author, or null to use current user
+	 * @return The retrieved workset metadata
+	 */
+	@GET
+	@Path("/metadata")
+	public Response getPublicWorksetMeta(@QueryParam("author") String author);
+
+	/**
 	 * Get access to the API for managing this workset's tags
 	 *
 	 * @return The {@link TagsAPI}

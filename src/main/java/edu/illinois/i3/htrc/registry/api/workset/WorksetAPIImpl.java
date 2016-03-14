@@ -181,6 +181,37 @@ public class WorksetAPIImpl implements WorksetAPI {
 		return new VolumesAPIImpl(_worksetId, _registry, _registryExtension);
 	}
 
+	@GET
+	@Path("/metadata")
+	public Response getWorksetMeta(@QueryParam("author") String author) {
+		Log.debug(String.format("getWorksetMeta: id=%s, author=%s, user=%s", _worksetId, author, _userName));
+
+		try {
+			if (author == null) author = _userName;
+			String resPath = _config.getWorksetPath(_worksetId, author);
+			Resource resource = _registry.get(resPath);
+
+			if (Log.isDebugEnabled())
+				LogUtils.logResource(Log, resource);
+
+			WorksetMeta worksetMeta = WorksetUtils.getWorksetMetaFromResource(resource, _registry);
+
+			return Response.ok(worksetMeta).build();
+		}
+		catch (AuthorizationFailedException e) {
+			return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions").type(MediaType.TEXT_PLAIN).build();
+		}
+		catch (ResourceNotFoundException e) {
+			String errorMsg = "Unable to locate workset: " + _worksetId;
+			return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+		}
+		catch (RegistryException e) {
+			Log.error("getWorksetMeta", e);
+			String errorMsg = String.format("Cannot retrieve workset meta: %s", e.toString());
+			return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+		}
+	}
+
 	@Path("/tags")
 	public TagsAPI getTagsAPI() {
 		return new TagsAPIImpl(_worksetId, _registry, _registryExtension);
