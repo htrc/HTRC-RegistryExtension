@@ -115,8 +115,10 @@ public class PublicWorksetAPIImpl implements PublicWorksetAPI {
 				LogUtils.logResource(Log, resource);
 
 			WorksetMeta worksetMeta = WorksetUtils.getWorksetMetaFromResource(resource, _registry);
+			Workset workset = new Workset();
+			workset.setMetadata(worksetMeta);
 
-			return Response.ok(worksetMeta).build();
+			return Response.ok(workset).build();
 		}
 		catch (AuthorizationFailedException e) {
 			return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions").type(MediaType.TEXT_PLAIN).build();
