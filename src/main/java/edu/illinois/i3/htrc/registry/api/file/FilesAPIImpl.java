@@ -92,7 +92,7 @@ public class FilesAPIImpl implements FilesAPI {
 
 		String userName = request.getRemoteUser();
 
-		if(userName != null){
+		if (userName != null) {
 			userName = MultitenantUtils.getTenantAwareUsername(userName);
 		}
 
@@ -140,7 +140,7 @@ public class FilesAPIImpl implements FilesAPI {
 
 		String userName = request.getRemoteUser();
 
-		if(userName != null){
+		if (userName != null) {
 			userName = MultitenantUtils.getTenantAwareUsername(userName);
 		}
 
@@ -180,7 +180,7 @@ public class FilesAPIImpl implements FilesAPI {
 
 		String userName = request.getRemoteUser();
 
-		if(userName != null){
+		if (userName != null) {
 			userName = MultitenantUtils.getTenantAwareUsername(userName);
 		}
 
@@ -266,7 +266,7 @@ public class FilesAPIImpl implements FilesAPI {
 		String userName;
 		String authenticatedUser = request.getRemoteUser();
 
-		if(authenticatedUser != null){
+		if (authenticatedUser != null) {
 			authenticatedUser = MultitenantUtils.getTenantAwareUsername(authenticatedUser);
 		}
 
@@ -342,15 +342,15 @@ public class FilesAPIImpl implements FilesAPI {
 		String userName;
 		String authenticatedUser = request.getRemoteUser();
 
-		if(authenticatedUser != null){
+		if (authenticatedUser != null) {
 			authenticatedUser = MultitenantUtils.getTenantAwareUsername(authenticatedUser);
 		}
 
 		// Allowing uploads to someone else files directory. (Requirement for Agent)
 		// TODO: Check permission of authenticated user.
-		if(user != null && user.length() > 0){
+		if (user != null && user.length() > 0) {
 			userName = user;
-		}else{
+		} else {
 			userName  = authenticatedUser;
 		}
 
@@ -411,7 +411,7 @@ public class FilesAPIImpl implements FilesAPI {
 
 		String userName = request.getRemoteUser();
 
-		if(userName != null){
+		if (userName != null) {
 			userName = MultitenantUtils.getTenantAwareUsername(userName);
 		}
 

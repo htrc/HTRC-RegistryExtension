@@ -7,6 +7,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import edu.illinois.i3.htrc.registry.entities.workset.WorksetMeta;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.registry.core.ActionConstants;
@@ -88,6 +89,49 @@ public class PublicWorksetAPIImpl implements PublicWorksetAPI {
 	@Path("/volumes")
 	public PublicVolumesAPI getPublicVolumesAPI() {
 		return new PublicVolumesAPIImpl(_worksetId, _registry, _registryExtension);
+	}
+
+	@GET
+	@Path("/metadata")
+	public Response getPublicWorksetMeta(@QueryParam("author") String author) {
+		Log.debug(String.format("getPublicWorksetMeta: id=%s, author=%s", _worksetId, author));
+
+		if (author == null)
+			return Response.status(Status.BAD_REQUEST)
+					.entity("author parameter is mandatory")
+					.type(MediaType.TEXT_PLAIN)
+					.build();
+
+		try {
+			String resPath = _config.getWorksetPath(_worksetId, author);
+
+			// check if public workset
+			if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET))
+				throw new AuthorizationFailedException(String.format("%s is not a public workset", _worksetId));
+
+			Resource resource = _registry.get(resPath);
+
+			if (Log.isDebugEnabled())
+				LogUtils.logResource(Log, resource);
+
+			WorksetMeta worksetMeta = WorksetUtils.getWorksetMetaFromResource(resource, _registry);
+			Workset workset = new Workset();
+			workset.setMetadata(worksetMeta);
+
+			return Response.ok(workset).build();
+		}
+		catch (AuthorizationFailedException e) {
+			return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions").type(MediaType.TEXT_PLAIN).build();
+		}
+		catch (ResourceNotFoundException e) {
+			String errorMsg = "Unable to locate workset: " + _worksetId;
+			return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+		}
+		catch (Exception e) {
+			Log.error("getPublicWorksetMeta", e);
+			String errorMsg = String.format("Cannot retrieve workset: %s", e.toString());
+			return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+		}
 	}
 
 	@Path("/tags")
