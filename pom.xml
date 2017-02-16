@@ -48,9 +48,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.governance</groupId>
             <artifactId>org.wso2.carbon.governance.api</artifactId>
-            <version>4.2.2</version>
+            <version>4.7.3</version>
             <scope>provided</scope>
         </dependency>
 
@@ -279,6 +279,11 @@
             <id>nexus</id>
             <name>HTRC Nexus Repository</name>
             <url>http://nexus.htrc.illinois.edu/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>wso2-nexus</id>
+            <name>WSO2 Nexus Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
         </repository>
     </repositories>
 
