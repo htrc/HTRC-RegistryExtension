@@ -48,42 +48,16 @@
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.governance</groupId>
             <artifactId>org.wso2.carbon.governance.api</artifactId>
-            <version>4.2.2</version>
+            <version>4.7.3</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>edu.indiana.d2i.htrc</groupId>
-            <artifactId>oauth2-servletfilter</artifactId>
-            <version>2.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.wso2.carbon</groupId>
-                    <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.wso2.carbon</groupId>
-                    <artifactId>org.wso2.carbon.utils</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.amber.wso2</groupId>
-                    <artifactId>amber</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.gdata.wso2</groupId>
-                    <artifactId>gdata-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.jettison</groupId>
-                    <artifactId>jettison</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-plugin-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>jwt-servletfilter</artifactId>
+            <version>0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -279,6 +253,11 @@
             <id>nexus</id>
             <name>HTRC Nexus Repository</name>
             <url>http://nexus.htrc.illinois.edu/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>wso2-nexus</id>
+            <name>WSO2 Nexus Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
         </repository>
     </repositories>
 

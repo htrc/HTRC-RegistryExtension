@@ -19,29 +19,17 @@
 	</listener>
 
 	<filter>
-		<filter-name>OAuth2Filter</filter-name>
-		<filter-class>edu.indiana.d2i.htrc.oauth2.filter.OAuth2Filter</filter-class>
+		<filter-name>JWTFilter</filter-name>
+		<filter-class>edu.indiana.d2i.htrc.identity.JWTServletFilter</filter-class>
 		<init-param>
-			<param-name>oauth2.provider.url</param-name>
-			<param-value>${oauth2.provider.url}</param-value>
-		</init-param>
-		<init-param>
-			<param-name>oauth2.provider.user</param-name>
-			<param-value>${oauth2.provider.user}</param-value>
-		</init-param>
-		<init-param>
-			<param-name>oauth2.provider.password</param-name>
-			<param-value>${oauth2.provider.password}</param-value>
-		</init-param>
-		<init-param>
-			<param-name>auditor.class</param-name>
-			<param-value>edu.indiana.d2i.htrc.audit.Log4jAuditor</param-value>
+			<param-name>htrc.jwtfilter.config</param-name>
+			<param-value>/etc/htrc/jwtfilter.conf</param-value>
 		</init-param>
 	</filter>
 
 	<filter-mapping>
-		<filter-name>OAuth2Filter</filter-name>
-		<servlet-name>CXFServletPrivate</servlet-name>
+		<filter-name>JWTFilter</filter-name>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<servlet>
