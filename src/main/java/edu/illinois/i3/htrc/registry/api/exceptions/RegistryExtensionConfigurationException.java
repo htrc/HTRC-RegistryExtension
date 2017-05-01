@@ -9,12 +9,12 @@ package edu.illinois.i3.htrc.registry.api.exceptions;
 @SuppressWarnings("serial")
 public class RegistryExtensionConfigurationException extends RegistryExtensionException {
 
-	/**
-	 * @param msg The error message
-	 * @see Exception#Exception(String)
-	 */
-	public RegistryExtensionConfigurationException(String msg) {
-		super(msg);
-	}
+    /**
+     * @param msg The error message
+     * @see Exception#Exception(String)
+     */
+    public RegistryExtensionConfigurationException(String msg) {
+        super(msg);
+    }
 
 }

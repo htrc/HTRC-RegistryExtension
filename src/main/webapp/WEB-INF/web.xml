@@ -18,20 +18,6 @@
 		<listener-class>edu.illinois.i3.htrc.registry.api.RegistryExtension</listener-class>
 	</listener>
 
-	<filter>
-		<filter-name>JWTFilter</filter-name>
-		<filter-class>edu.indiana.d2i.htrc.identity.JWTServletFilter</filter-class>
-		<init-param>
-			<param-name>htrc.jwtfilter.config</param-name>
-			<param-value>/etc/htrc/jwtfilter.conf</param-value>
-		</init-param>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>JWTFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
 	<servlet>
 		<description>RegExt Private API</description>
 		<servlet-name>CXFServletPrivate</servlet-name>
