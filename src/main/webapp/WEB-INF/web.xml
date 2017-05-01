@@ -10,7 +10,7 @@
     <context-param>
         <description>The Registry Extension configuration file</description>
         <param-name>htrcConfig</param-name>
-        <param-value>WEB-INF/htrc.properties</param-value>
+        <param-value>WEB-INF/htrc.conf</param-value>
     </context-param>
     -->
 

@@ -1,16 +1,17 @@
 package edu.illinois.i3.htrc.registry.api;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigException;
+import com.typesafe.config.ConfigFactory;
 import edu.illinois.i3.htrc.registry.api.exceptions.RegistryExtensionConfigurationException;
 import edu.illinois.i3.htrc.registry.api.exceptions.RegistryExtensionException;
 import edu.illinois.i3.htrc.registry.api.utils.RegistryUtils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.net.URL;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import net.jmatrix.eproperties.EProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.registry.core.ActionConstants;
@@ -45,9 +46,11 @@ public class RegistryExtension implements ServletContextListener {
 
         try {
             // attempt to load the configuration file
-            EProperties configProps = getConfigProperties(context);
-            Properties htrcProps = configProps.getProperties(Constants.HTRC_CONFIG_PARAM);
-            if (htrcProps == null) {
+            Config config = getConfigProperties(context);
+            Config htrcConfig;
+            try {
+                htrcConfig = config.getConfig(Constants.HTRC_CONFIG_PARAM);
+            } catch (ConfigException.Missing e) {
                 throw new RegistryExtensionConfigurationException(
                         "Missing configuration section: " + Constants.HTRC_CONFIG_PARAM);
             }
@@ -61,7 +64,7 @@ public class RegistryExtension implements ServletContextListener {
             RegistryService registryService = registryContext.getEmbeddedRegistryService();
             RealmService realmService = registryContext.getRealmService();
 
-            _config = new RegistryExtensionConfig(htrcProps);
+            _config = new RegistryExtensionConfig(htrcConfig);
             _registryUtils = new RegistryUtils(registryService, realmService);
 
             createRequiredPaths();
@@ -134,29 +137,23 @@ public class RegistryExtension implements ServletContextListener {
      * Load the registry extension configuration
      *
      * @param servletContext The {@link ServletContext} instance
-     * @return The {@link EProperties} instance holding the registry extension configuration
-     * @throws FileNotFoundException Thrown if the configuration file is not found
-     * @throws IOException Thrown if there is a problem reading the configuration file
+     * @return The {@link Config} instance holding the registry extension configuration
+     * @throws IOException Thrown if the configuration file is not found or is invalid
      */
-    private EProperties getConfigProperties(ServletContext servletContext)
-            throws FileNotFoundException, IOException {
+    private Config getConfigProperties(ServletContext servletContext) throws IOException {
         String htrcConfig = servletContext.getInitParameter(Constants.WEBXML_CONFIG_PARAM);
         if (htrcConfig == null) {
             htrcConfig = Constants.DEFAULT_CONFIG_LOCATION;
         }
 
-        InputStream configStream = servletContext.getResourceAsStream(htrcConfig);
-        if (configStream == null) {
+        URL configUrl = servletContext.getResource(htrcConfig);
+        if (configUrl == null) {
             throw new FileNotFoundException("Missing configuration file: " + htrcConfig);
         }
 
         Log.info("Loading Registry Extension configuration from " + htrcConfig);
 
-        EProperties.showVersion = false;
-        EProperties configProps = new EProperties();
-        configProps.load(configStream);
-
-        return configProps;
+        return ConfigFactory.parseURL(configUrl).resolve();
     }
 
 }

@@ -61,9 +61,9 @@
         </dependency>
 
         <dependency>
-            <groupId>net.jmatrix</groupId>
-            <artifactId>eproperties</artifactId>
-            <version>1.1.5</version>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>1.2.1</version>
         </dependency>
 
         <dependency>

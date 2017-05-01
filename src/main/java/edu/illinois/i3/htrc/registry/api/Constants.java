@@ -10,7 +10,7 @@ public class Constants {
     /**
      * Default configuration file, if not specified in configuration
      */
-    public static final String DEFAULT_CONFIG_LOCATION = "WEB-INF/htrc.properties";
+    public static final String DEFAULT_CONFIG_LOCATION = "WEB-INF/htrc.conf";
 
     /**
      * The web.xml parameter name for specifying the configuration file location
@@ -21,6 +21,12 @@ public class Constants {
      * The section name in the configuration file used to store registry extension configuration
      */
     public static final String HTRC_CONFIG_PARAM = "htrc";
+
+    /**
+     * True/False indicating whether the configuration settings will be dumped to the log file
+     * on startup, for debug purposes
+     */
+    public static final String HTRC_CONFIG_DEBUG = "config.debug";
 
     /**
      * The base path where registry data is stored

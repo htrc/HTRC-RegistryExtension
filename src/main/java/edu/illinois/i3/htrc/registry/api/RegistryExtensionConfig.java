@@ -1,8 +1,8 @@
 package edu.illinois.i3.htrc.registry.api;
 
+import com.typesafe.config.Config;
 import edu.illinois.i3.htrc.registry.api.exceptions.RegistryExtensionConfigurationException;
 import java.util.Arrays;
-import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -12,8 +12,6 @@ import org.apache.commons.logging.LogFactory;
  * @author capitanu
  */
 public class RegistryExtensionConfig {
-
-    private static final Log Log = LogFactory.getLog(RegistryExtensionConfig.class);
 
     /**
      * The array of required config parameters
@@ -25,7 +23,7 @@ public class RegistryExtensionConfig {
             Constants.HTRC_CONFIG_USER_WORKSETS,
             Constants.HTRC_CONFIG_USER_FILES
     };
-
+    private static final Log Log = LogFactory.getLog(RegistryExtensionConfig.class);
     private final String _cfgBasePath;
     private final String _cfgPublicFilesPath;
     private final String _cfgPublicPath;
@@ -35,29 +33,32 @@ public class RegistryExtensionConfig {
     /**
      * Constructor
      *
-     * @param configProps The registry extension configuration properties
+     * @param config The registry extension configuration properties
      * @throws RegistryExtensionConfigurationException Thrown if incomplete configuration
      */
-    public RegistryExtensionConfig(Properties configProps)
-            throws RegistryExtensionConfigurationException {
-        if (!configProps.keySet().containsAll(Arrays.asList(REQUIRED_CONFIG_PARAMS))) {
-            throw new RegistryExtensionConfigurationException(
-                    "Incomplete configuration - required parameters: " + Arrays
-                            .toString(REQUIRED_CONFIG_PARAMS));
-        }
-
-        if (Log.isDebugEnabled()) {
-            Log.debug("== Configuration ==");
-            for (String cfgParam : REQUIRED_CONFIG_PARAMS) {
-                Log.debug("== " + cfgParam + ": " + configProps.getProperty(cfgParam));
+    public RegistryExtensionConfig(Config config) throws RegistryExtensionConfigurationException {
+        // check for existence of required config parameters
+        for (String cfgParam : REQUIRED_CONFIG_PARAMS) {
+            if (!config.hasPath(cfgParam)) {
+                throw new RegistryExtensionConfigurationException(
+                        "Incomplete configuration - required parameters: " + Arrays
+                                .toString(REQUIRED_CONFIG_PARAMS));
             }
         }
 
-        _cfgBasePath = configProps.getProperty(Constants.HTRC_CONFIG_BASE_PATH);
-        _cfgPublicPath = configProps.getProperty(Constants.HTRC_CONFIG_PUBLIC_HOME);
-        _cfgPublicFilesPath = configProps.getProperty(Constants.HTRC_CONFIG_PUBLIC_FILES);
-        _cfgUserWorksetsPath = configProps.getProperty(Constants.HTRC_CONFIG_USER_WORKSETS);
-        _cfgUserFilesPath = configProps.getProperty(Constants.HTRC_CONFIG_USER_FILES);
+        if (config.hasPath(Constants.HTRC_CONFIG_DEBUG) &&
+                config.getBoolean(Constants.HTRC_CONFIG_DEBUG)) {
+            Log.info("== Configuration ==");
+            for (String cfgParam : REQUIRED_CONFIG_PARAMS) {
+                Log.info("== " + cfgParam + ": " + config.getValue(cfgParam).unwrapped().toString());
+            }
+        }
+
+        _cfgBasePath = config.getString(Constants.HTRC_CONFIG_BASE_PATH);
+        _cfgPublicPath = config.getString(Constants.HTRC_CONFIG_PUBLIC_HOME);
+        _cfgPublicFilesPath = config.getString(Constants.HTRC_CONFIG_PUBLIC_FILES);
+        _cfgUserWorksetsPath = config.getString(Constants.HTRC_CONFIG_USER_WORKSETS);
+        _cfgUserFilesPath = config.getString(Constants.HTRC_CONFIG_USER_FILES);
     }
 
     /**
