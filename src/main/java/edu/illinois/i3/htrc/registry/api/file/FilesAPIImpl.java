@@ -53,6 +53,11 @@ public class FilesAPIImpl implements FilesAPI {
 
     private static final Log Log = LogFactory.getLog(FilesAPIImpl.class);
 
+    protected @Context
+    HttpServletRequest _request;
+    protected @QueryParam("user")
+    String debugUserName;
+
     protected RegistryExtension _registryExtension;
     protected RegistryUtils _registryUtils;
     protected RegistryExtensionConfig _config;
@@ -87,7 +92,7 @@ public class FilesAPIImpl implements FilesAPI {
             @DefaultValue(".*") @QueryParam("type") String typeFilterRegexp,
             @DefaultValue("false") @QueryParam("public") boolean listPublic) {
 
-        String userName = request.getRemoteUser();
+        String userName = getAuthenticatedUser();
 
         if (userName != null) {
             userName = MultitenantUtils.getTenantAwareUsername(userName);
@@ -145,7 +150,7 @@ public class FilesAPIImpl implements FilesAPI {
             @PathParam("path") String path,
             @DefaultValue("false") @QueryParam("public") boolean checkPublic) {
 
-        String userName = request.getRemoteUser();
+        String userName = getAuthenticatedUser();
 
         if (userName != null) {
             userName = MultitenantUtils.getTenantAwareUsername(userName);
@@ -193,7 +198,7 @@ public class FilesAPIImpl implements FilesAPI {
             @DefaultValue(".*") @QueryParam("type") String typeFilterRegexp,
             @DefaultValue("false") @QueryParam("public") boolean getPublic) {
 
-        String userName = request.getRemoteUser();
+        String userName = getAuthenticatedUser();
 
         if (userName != null) {
             userName = MultitenantUtils.getTenantAwareUsername(userName);
@@ -291,7 +296,7 @@ public class FilesAPIImpl implements FilesAPI {
             List<Attachment> attachments) {
 
         String userName;
-        String authenticatedUser = request.getRemoteUser();
+        String authenticatedUser = getAuthenticatedUser();
 
         if (authenticatedUser != null) {
             authenticatedUser = MultitenantUtils.getTenantAwareUsername(authenticatedUser);
@@ -373,7 +378,7 @@ public class FilesAPIImpl implements FilesAPI {
             InputStream fileStream) {
 
         String userName;
-        String authenticatedUser = request.getRemoteUser();
+        String authenticatedUser = getAuthenticatedUser();
 
         if (authenticatedUser != null) {
             authenticatedUser = MultitenantUtils.getTenantAwareUsername(authenticatedUser);
@@ -446,7 +451,7 @@ public class FilesAPIImpl implements FilesAPI {
             @PathParam("path") String path,
             @DefaultValue("false") @QueryParam("public") boolean delPublic) {
 
-        String userName = request.getRemoteUser();
+        String userName = getAuthenticatedUser();
 
         if (userName != null) {
             userName = MultitenantUtils.getTenantAwareUsername(userName);
@@ -514,4 +519,18 @@ public class FilesAPIImpl implements FilesAPI {
         }
     }
 
+    /**
+     * Return the currently authenticated user
+     *
+     * @return The currently authenticated user, or null if not authenticated
+     */
+    protected String getAuthenticatedUser() {
+        // TODO: remove before deploy!!!
+        String remoteUser = debugUserName != null ? debugUserName : _request.getRemoteUser();
+
+        return (remoteUser != null) ?
+            // Extract user name part from username with tenant (e.g. admin@carbon.super)
+            MultitenantUtils.getTenantAwareUsername(remoteUser) :
+            null;
+    }
 }

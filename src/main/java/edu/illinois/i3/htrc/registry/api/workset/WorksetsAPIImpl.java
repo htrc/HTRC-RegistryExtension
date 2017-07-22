@@ -221,7 +221,8 @@ public class WorksetsAPIImpl implements WorksetsAPI {
      * @return The currently authenticated user, or null if not authenticated
      */
     protected String getAuthenticatedUser() {
-        String remoteUser = _request.getRemoteUser();
+        // TODO: remove before deploy!!!
+        String remoteUser = debugUserName != null ? debugUserName : _request.getRemoteUser();
 
         return (remoteUser != null) ?
                 // Extract user name part from username with tenant (e.g. admin@carbon.super)
