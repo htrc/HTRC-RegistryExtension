@@ -230,11 +230,6 @@
             <name>HTRC Nexus Repository</name>
             <url>http://nexus.htrc.illinois.edu/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>wso2-nexus</id>
-            <name>WSO2 Nexus Repository</name>
-            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
-        </repository>
     </repositories>
 
     <pluginRepositories>
