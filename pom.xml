@@ -7,11 +7,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
         <CApp.type>webapp/jaxws</CApp.type>
-        <cxf.version>2.7.16</cxf.version>
-        <java.version>1.7</java.version>
         <servlet.version>2.5</servlet.version>
-        <webapp.filter>development</webapp.filter>
+        <cxf.version>2.7.16</cxf.version>
+        <webapp.filter>local</webapp.filter>
         <github.global.server>github</github.global.server>
         <public.code.repo>git://github.com/htrc</public.code.repo>
         <developer.code.repo>git@github.com:htrc</developer.code.repo>
@@ -57,7 +58,7 @@
         <dependency>
             <groupId>edu.indiana.d2i.htrc</groupId>
             <artifactId>jwt-servletfilter</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>1.2</version>
         </dependency>
 
         <dependency>
@@ -76,16 +77,6 @@
     <!-- Build Settings -->
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -159,21 +150,6 @@
                             <Build-Date>${git.build.time}</Build-Date>
                         </manifestEntries>
                     </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>external.atlassian.jgitflow</groupId>
-                <artifactId>jgitflow-maven-plugin</artifactId>
-                <version>1.0-m5.1</version>
-                <configuration>
-                    <!-- see https://bitbucket.org/atlassian/jgit-flow/wiki/goals.wiki for configuration options -->
-                    <pushFeatures>true</pushFeatures>
-                    <pushReleases>true</pushReleases>
-                    <pushHotfixes>true</pushHotfixes>
-                    <flowInitContext>
-                        <versionTagPrefix>v</versionTagPrefix>
-                    </flowInitContext>
                 </configuration>
             </plugin>
 

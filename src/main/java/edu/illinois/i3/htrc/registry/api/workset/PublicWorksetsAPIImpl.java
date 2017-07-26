@@ -2,12 +2,11 @@ package edu.illinois.i3.htrc.registry.api.workset;
 
 import edu.illinois.i3.htrc.registry.api.RegistryExtension;
 import edu.illinois.i3.htrc.registry.api.RegistryExtensionConfig;
-import edu.illinois.i3.htrc.registry.api.utils.LogUtils;
 import edu.illinois.i3.htrc.registry.api.utils.RegistryUtils;
 import edu.illinois.i3.htrc.registry.api.utils.WorksetUtils;
 import edu.illinois.i3.htrc.registry.entities.workset.Workset;
+import edu.illinois.i3.htrc.registry.entities.workset.WorksetMeta;
 import edu.illinois.i3.htrc.registry.entities.workset.Worksets;
-import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -20,13 +19,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Collection;
-import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
-import org.wso2.carbon.user.core.UserStoreException;
 
 /**
  * JAX-RS Implementation for {@link PublicWorksetsAPI}
@@ -40,9 +35,8 @@ public class PublicWorksetsAPIImpl implements PublicWorksetsAPI {
     protected @Context
     HttpServletRequest _request;
 
-    private RegistryExtension _registryExtension;
-    private RegistryUtils _registryUtils;
     private RegistryExtensionConfig _config;
+    private ServletContext _context;
 
     /**
      * Injected ServletContext
@@ -51,42 +45,30 @@ public class PublicWorksetsAPIImpl implements PublicWorksetsAPI {
      */
     @javax.annotation.Resource
     public void setServletContext(ServletContext context) {
-        _registryExtension = (RegistryExtension) context
-                .getAttribute(RegistryExtension.class.getName());
-        _registryUtils = _registryExtension.getRegistryUtils();
-        _config = _registryExtension.getConfig();
+        _config = RegistryExtension.getConfig();
+        _context = context;
     }
 
     @GET
     public Response getPublicWorksets() {
-        Log.debug("getPublicWorksets");
+        Log.info("getPublicWorksets");
 
         Worksets worksets = new Worksets();
         List<Workset> worksetList = worksets.getWorksets();
+
         try {
-            UserRegistry adminRegistry = _registryUtils.getAdminRegistry();
-            Collection htrc = (Collection) adminRegistry.get(_config.getBasePath());
-
-            String[] users = htrc.getChildren();
-            for (int i = 0; i < users.length; i++)
-            // normalize user names
-            {
-                users[i] = users[i].substring(users[i].lastIndexOf("/") + 1);
+            UserRegistry adminRegistry = RegistryUtils.getAdminRegistry();
+            Collection publicWorksets = WorksetUtils.getPublicWorksetsCollection(_context);
+            List<WorksetMeta> metas = WorksetUtils.getWorksetsMeta(publicWorksets, adminRegistry);
+            for (WorksetMeta meta : metas) {
+                Workset workset = new Workset();
+                workset.setMetadata(meta);
+                worksetList.add(workset);
             }
-
-            for (String user : users) {
-                String userWorksetsPath = _config.getUserWorksetsPath(user);
-                if (!adminRegistry.resourceExists(userWorksetsPath)) {
-                    Log.warn("Missing user worksets path: " + userWorksetsPath);
-                    continue;
-                }
-
-                Collection userWorksetCollection = (Collection) adminRegistry.get(userWorksetsPath);
-                worksetList.addAll(getPublicUserWorksets(userWorksetCollection, adminRegistry));
-            }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Log.error("getPublicWorksets", e);
-            String errorMsg = String.format("Cannot retrieve worksets: %s", e.toString());
+            String errorMsg = String.format("Cannot retrieve public worksets: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
         }
 
@@ -96,61 +78,18 @@ public class PublicWorksetsAPIImpl implements PublicWorksetsAPI {
     @Path("/{worksetId}")
     public PublicWorksetAPI getPublicWorksetAPI(@PathParam("worksetId") String worksetId) {
         try {
-            UserRegistry registry = _registryUtils.getAdminRegistry();
-            return new PublicWorksetAPIImpl(worksetId, registry, _registryExtension);
-        } catch (RegistryException e) {
+            UserRegistry registry = RegistryUtils.getAdminRegistry();
+            return new PublicWorksetAPIImpl(worksetId, registry);
+        }
+        catch (RegistryException e) {
             Log.error("getPublicWorksetAPI", e);
             String errorMsg = String.format("Error processing workset API: %s", e.toString());
             throw new WebApplicationException(
-                    Response.serverError()
-                            .entity(errorMsg)
-                            .type(MediaType.TEXT_PLAIN)
-                            .build());
+                Response.serverError()
+                        .entity(errorMsg)
+                        .type(MediaType.TEXT_PLAIN)
+                        .build());
         }
     }
 
-    /**
-     * Get the list of public worksets in a registry collection
-     *
-     * @param worksetCollection The registry collection
-     * @param registry The {@link UserRegistry} instance
-     * @return The list of public worksets
-     * @throws RegistryException Thrown if a registry error occurs
-     */
-    private List<Workset> getPublicUserWorksets(Collection worksetCollection, UserRegistry registry)
-            throws RegistryException {
-        List<Workset> worksets = new ArrayList<Workset>();
-        for (String child : worksetCollection.getChildren()) {
-            Resource resource;
-            try {
-                resource = registry.get(child);
-            } catch (AuthorizationFailedException afe) {
-                Log.warn(String.format(
-                        "getUserWorksets: Registry authorization failure for '%s'. This should not happen."
-                                +
-                                " But latest Registry version's Collection/getChildren returns private resources.",
-                        child));
-                continue;
-            }
-
-            if (Log.isDebugEnabled()) {
-                LogUtils.logResource(Log, resource);
-            }
-
-            try {
-                // check if public workset
-                if (RegistryUtils
-                        .isEveryoneAuthorized(resource.getPath(), registry, ActionConstants.GET)) {
-                    Workset workset = new Workset();
-                    workset.setMetadata(
-                            WorksetUtils.getWorksetMetaFromResource(resource, registry));
-                    worksets.add(workset);
-                }
-            } catch (UserStoreException e) {
-                throw new RegistryException("getPublicUserWorksets", e);
-            }
-        }
-
-        return worksets;
-    }
 }

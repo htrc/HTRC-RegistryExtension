@@ -51,21 +51,20 @@ public class VolumesAPIImpl implements VolumesAPI {
     private final String _userName;
     private final RegistryExtensionConfig _config;
 
-    public VolumesAPIImpl(String worksetId, UserRegistry registry,
-            RegistryExtension registryExtension) {
+    public VolumesAPIImpl(String worksetId, UserRegistry registry) {
         _worksetId = worksetId;
         _registry = registry;
         _userName = registry.getUserName();
-        _config = registryExtension.getConfig();
+        _config = RegistryExtension.getConfig();
     }
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getVolumesAsPlainText(@QueryParam("author") String author) {
         Log.debug(
-                String.format("getVolumesAsPlainText: id=%s, author=%s, user=%s", _worksetId,
-                        author,
-                        _userName));
+            String.format("getVolumesAsPlainText: id=%s, author=%s, user=%s",
+                          _worksetId, author, _userName)
+        );
 
         try {
             if (author == null) {
@@ -84,14 +83,17 @@ public class VolumesAPIImpl implements VolumesAPI {
 
             String response = sb.length() > 0 ? sb.substring(1) : sb.toString();
             return Response.ok(response).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             Log.error("getVolumesAsPlainText", e);
             String errorMsg = String.format("Cannot retrieve volumes: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -101,8 +103,10 @@ public class VolumesAPIImpl implements VolumesAPI {
     @GET
     @Produces(HTRCMediaTypes.TEXT_CSV)
     public Response getVolumesAsCSV(@QueryParam("author") String author) {
-        Log.debug(String.format("getVolumesAsCSV: id=%s, author=%s, user=%s", _worksetId, author,
-                _userName));
+        Log.debug(
+            String.format("getVolumesAsCSV: id=%s, author=%s, user=%s",
+                          _worksetId, author, _userName)
+        );
 
         try {
             if (author == null) {
@@ -126,8 +130,8 @@ public class VolumesAPIImpl implements VolumesAPI {
                 try {
                     final CsvEncoder csvEncoder = new DefaultCsvEncoder();
                     final CsvPreference csvPreference =
-                            new CsvPreference.Builder(CsvPreference.EXCEL_PREFERENCE)
-                                    .useEncoder(csvEncoder).build();
+                        new CsvPreference.Builder(CsvPreference.EXCEL_PREFERENCE)
+                            .useEncoder(csvEncoder).build();
                     csvWriter = new CsvMapWriter(csvData, csvPreference);
 
                     int size = propertyNames.size() + 1; // +1 for volume_id
@@ -155,15 +159,17 @@ public class VolumesAPIImpl implements VolumesAPI {
                         // add the volume properties
                         for (Property property : volume.getProperties()) {
                             Log.debug(String.format(
-                                    "getVolumesAsCSV: vol: %s propName: %s propValue: %s",
-                                    volume.getId(), property.getName(),
-                                    property.getValue().toString()));
-                            rowData.put(property.getName(), property.getValue().toString());
+                                "getVolumesAsCSV: vol: %s propName: %s propValue: %s",
+                                volume.getId(), property.getName(),
+                                property.getValue()
+                            ));
+                            rowData.put(property.getName(), property.getValue());
                         }
 
                         csvWriter.write(rowData, header, processors);
                     }
-                } finally {
+                }
+                finally {
                     if (csvWriter != null) {
                         csvWriter.close();
                     }
@@ -172,14 +178,17 @@ public class VolumesAPIImpl implements VolumesAPI {
 
             String response = csvData.toString();
             return Response.ok(response).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             Log.error("getVolumesAsCSV", e);
             String errorMsg = String.format("Cannot retrieve volumes: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -189,8 +198,8 @@ public class VolumesAPIImpl implements VolumesAPI {
     @GET
     public Response getVolumes(@QueryParam("author") String author) {
         Log.debug(
-                String.format("getVolumes: id=%s, author=%s, user=%s", _worksetId, author,
-                        _userName));
+            String.format("getVolumes: id=%s, author=%s, user=%s", _worksetId, author, _userName)
+        );
 
         try {
             if (author == null) {
@@ -204,14 +213,17 @@ public class VolumesAPIImpl implements VolumesAPI {
             }
 
             return Response.ok(volumes).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             Log.error("getVolumes", e);
             String errorMsg = String.format("Cannot retrieve volumes: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -220,8 +232,8 @@ public class VolumesAPIImpl implements VolumesAPI {
 
     @PUT
     @Consumes({
-            HTRCMediaTypes.VOLUME_XML,
-            HTRCMediaTypes.VOLUME_JSON
+        HTRCMediaTypes.VOLUME_XML,
+        HTRCMediaTypes.VOLUME_JSON
     })
     public Response replaceVolumes(Volumes volumes) {
         Log.debug(String.format("replaceVolumes: id=%s, user=%s", _worksetId, _userName));
@@ -230,16 +242,20 @@ public class VolumesAPIImpl implements VolumesAPI {
             String resPath = _config.getWorksetPath(_worksetId, _userName);
             Resource resource = _registry.get(resPath);
             resource.setContentStream(
-                    WorksetUtils.createWorksetContentStream(volumes.getVolumes()));
-            resource.setProperty(Constants.HTRC_PROP_VOLCOUNT,
-                    Integer.toString(volumes.getVolumes().size()));
+                WorksetUtils.createWorksetContentStream(volumes.getVolumes()));
+            resource.setProperty(
+                Constants.HTRC_PROP_VOLCOUNT,
+                Integer.toString(volumes.getVolumes().size())
+            );
             _registry.put(resPath, resource);
             return Response.ok(volumes).build();
-        } catch (ResourceNotFoundException e) {
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             String errorMsg = String.format("Cannot replace volumes: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
         }

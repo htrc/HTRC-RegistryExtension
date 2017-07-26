@@ -14,10 +14,10 @@ import javax.ws.rs.core.Response;
  */
 
 @Produces({
-        HTRCMediaTypes.VOLUME_XML,
-        HTRCMediaTypes.VOLUME_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+    HTRCMediaTypes.VOLUME_XML,
+    HTRCMediaTypes.VOLUME_JSON,
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
 })
 public interface PublicVolumesAPI {
 
@@ -29,7 +29,7 @@ public interface PublicVolumesAPI {
      */
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getVolumesAsPlainText(@QueryParam("author") String author);
+    Response getVolumesAsPlainText(@QueryParam("author") String author);
 
     /**
      * GET: Retrieve workset volumes as CSV
@@ -39,7 +39,7 @@ public interface PublicVolumesAPI {
      */
     @GET
     @Produces(HTRCMediaTypes.TEXT_CSV)
-    public Response getVolumesAsCSV(@QueryParam("author") String author);
+    Response getVolumesAsCSV(@QueryParam("author") String author);
 
     /**
      * GET: Retrieve the workset volumes as XML or JSON
@@ -48,6 +48,6 @@ public interface PublicVolumesAPI {
      * @return The workset volumes
      */
     @GET
-    public Response getVolumes(@QueryParam("author") String author);
+    Response getVolumes(@QueryParam("author") String author);
 
 }

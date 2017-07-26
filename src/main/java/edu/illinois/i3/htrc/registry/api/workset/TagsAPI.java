@@ -14,10 +14,10 @@ import javax.ws.rs.core.Response;
  */
 
 @Produces({
-        HTRCMediaTypes.TAG_XML,
-        HTRCMediaTypes.TAG_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+    HTRCMediaTypes.TAG_XML,
+    HTRCMediaTypes.TAG_JSON,
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
 })
 public interface TagsAPI {
 
@@ -28,6 +28,6 @@ public interface TagsAPI {
      * @return The tags
      */
     @GET
-    public Response getTags(@QueryParam("author") String author);
+    Response getTags(@QueryParam("author") String author);
 
 }

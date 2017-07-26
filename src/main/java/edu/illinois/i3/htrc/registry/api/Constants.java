@@ -1,5 +1,7 @@
 package edu.illinois.i3.htrc.registry.api;
 
+import java.util.regex.Pattern;
+
 /**
  * Constants used in the Registry Extension
  *
@@ -16,6 +18,11 @@ public class Constants {
      * The web.xml parameter name for specifying the configuration file location
      */
     public static final String WEBXML_CONFIG_PARAM = "htrcConfig";
+
+    /**
+     * The web.xml parameter for specifying the SQL query to use for retrieving public worksets
+     */
+    public static final String WEBXML_CONFIG_PUBLIC_WORKSETS_QUERY = "publicWorksetsPathQuery";
 
     /**
      * The section name in the configuration file used to store registry extension configuration
@@ -68,4 +75,8 @@ public class Constants {
      */
     public static final String HTRC_PROP_VOLCOUNT = "htrc.volumeCount";
 
+    /**
+     * Regex pattern to validate HTRC volume IDs
+     */
+    public static final Pattern VALID_HTRC_ID_REGEX = Pattern.compile("^\\w{2,4}\\.\\S{4,30}$");
 }

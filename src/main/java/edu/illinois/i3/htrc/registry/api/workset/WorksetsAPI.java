@@ -21,10 +21,10 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({
-        HTRCMediaTypes.WORKSET_XML,
-        HTRCMediaTypes.WORKSET_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+    HTRCMediaTypes.WORKSET_XML,
+    HTRCMediaTypes.WORKSET_JSON,
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
 })
 public interface WorksetsAPI {
 
@@ -32,26 +32,27 @@ public interface WorksetsAPI {
      * GET: Retrieve a user's list of worksets
      *
      * @param includePublic True to include "public" worksets (shared with everyone), False
-     * otherwise
+     *                      otherwise
      * @return The list of worksets for the currently authorized user
      */
     @GET
-    public Response getWorksets(@DefaultValue("false") @QueryParam("public") boolean includePublic);
+    Response getWorksets(@DefaultValue("false") @QueryParam("public") boolean includePublic);
 
     /**
      * POST: Upload a new workset
      *
-     * @param workset The workset
+     * @param workset  The workset
      * @param isPublic True to make this workset "public" (shared with everyone), False otherwise
      * @return The workset
      */
     @POST
     @Consumes({
-            HTRCMediaTypes.WORKSET_XML,
-            HTRCMediaTypes.WORKSET_JSON
+        HTRCMediaTypes.WORKSET_XML,
+        HTRCMediaTypes.WORKSET_JSON
     })
-    public Response newWorkset(Workset workset,
-            @DefaultValue("false") @QueryParam("public") boolean isPublic);
+    Response newWorkset(
+        Workset workset,
+        @DefaultValue("false") @QueryParam("public") boolean isPublic);
 
     /**
      * Get access to a {@link WorksetAPI} instance used to manage individual worksets
@@ -60,6 +61,6 @@ public interface WorksetsAPI {
      * @return The {@link WorksetAPI}
      */
     @Path("/{id}")
-    public WorksetAPI getWorksetAPI(@PathParam("id") String id);
+    WorksetAPI getWorksetAPI(@PathParam("id") String id);
 
 }

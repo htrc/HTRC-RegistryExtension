@@ -18,7 +18,7 @@ public class RegistryExtensionException extends Exception {
     }
 
     /**
-     * @param msg The error message
+     * @param msg       The error message
      * @param throwable The inner exception
      * @see Exception#Exception(String, Throwable)
      */

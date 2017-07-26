@@ -49,25 +49,24 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
     private final UserRegistry _registry;
     private final RegistryExtensionConfig _config;
 
-    public PublicVolumesAPIImpl(String worksetId, UserRegistry registry,
-            RegistryExtension registryExtension) {
+    public PublicVolumesAPIImpl(String worksetId, UserRegistry registry) {
         _worksetId = worksetId;
         _registry = registry;
-        _config = registryExtension.getConfig();
+        _config = RegistryExtension.getConfig();
     }
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getVolumesAsPlainText(@QueryParam("author") String author) {
         Log.debug(
-                String.format("getVolumesAsPlainText(public): id=%s, author=%s", _worksetId,
-                        author));
+            String.format("getVolumesAsPlainText(public): id=%s, author=%s", _worksetId, author)
+        );
 
         if (author == null) {
             return Response.status(Status.BAD_REQUEST)
-                    .entity("author parameter is mandatory")
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
+                           .entity("author parameter is mandatory")
+                           .type(MediaType.TEXT_PLAIN)
+                           .build();
         }
 
         try {
@@ -76,7 +75,7 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
             // check if public workset
             if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET)) {
                 throw new AuthorizationFailedException(
-                        String.format("%s is not a public workset", _worksetId));
+                    String.format("%s is not a public workset", _worksetId));
             }
 
             Resource resource = _registry.get(resPath);
@@ -91,14 +90,17 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
 
             String response = sb.length() > 0 ? sb.substring(1) : sb.toString();
             return Response.ok(response).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             Log.error("getVolumesAsPlainText(public)", e);
             String errorMsg = String.format("Cannot retrieve volumes: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -112,9 +114,9 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
 
         if (author == null) {
             return Response.status(Status.BAD_REQUEST)
-                    .entity("author parameter is mandatory")
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
+                           .entity("author parameter is mandatory")
+                           .type(MediaType.TEXT_PLAIN)
+                           .build();
         }
 
         try {
@@ -123,7 +125,7 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
             // check if public workset
             if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET)) {
                 throw new AuthorizationFailedException(
-                        String.format("%s is not a public workset", _worksetId));
+                    String.format("%s is not a public workset", _worksetId));
             }
 
             Resource resource = _registry.get(resPath);
@@ -143,8 +145,8 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
                 try {
                     final CsvEncoder csvEncoder = new DefaultCsvEncoder();
                     final CsvPreference csvPreference =
-                            new CsvPreference.Builder(CsvPreference.EXCEL_PREFERENCE)
-                                    .useEncoder(csvEncoder).build();
+                        new CsvPreference.Builder(CsvPreference.EXCEL_PREFERENCE)
+                            .useEncoder(csvEncoder).build();
                     csvWriter = new CsvMapWriter(csvData, csvPreference);
 
                     int size = propertyNames.size() + 1; // +1 for volume_id
@@ -172,15 +174,17 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
                         // add the volume properties
                         for (Property property : volume.getProperties()) {
                             Log.debug(String.format(
-                                    "getVolumesAsCSV(public): vol: %s propName: %s propValue: %s",
-                                    volume.getId(), property.getName(),
-                                    property.getValue().toString()));
-                            rowData.put(property.getName(), property.getValue().toString());
+                                "getVolumesAsCSV(public): vol: %s propName: %s propValue: %s",
+                                volume.getId(), property.getName(),
+                                property.getValue()
+                            ));
+                            rowData.put(property.getName(), property.getValue());
                         }
 
                         csvWriter.write(rowData, header, processors);
                     }
-                } finally {
+                }
+                finally {
                     if (csvWriter != null) {
                         csvWriter.close();
                     }
@@ -189,14 +193,17 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
 
             String response = csvData.toString();
             return Response.ok(response).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             Log.error("getVolumesAsCSV(public)", e);
             String errorMsg = String.format("Cannot retrieve volumes: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -209,9 +216,9 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
 
         if (author == null) {
             return Response.status(Status.BAD_REQUEST)
-                    .entity("author parameter is mandatory")
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
+                           .entity("author parameter is mandatory")
+                           .type(MediaType.TEXT_PLAIN)
+                           .build();
         }
 
         try {
@@ -220,7 +227,7 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
             // check if public workset
             if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET)) {
                 throw new AuthorizationFailedException(
-                        String.format("%s is not a public workset", _worksetId));
+                    String.format("%s is not a public workset", _worksetId));
             }
 
             Resource resource = _registry.get(resPath);
@@ -230,14 +237,17 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
             }
 
             return Response.ok(volumes).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             Log.error("getVolumes(public)", e);
             String errorMsg = String.format("Cannot retrieve volumes: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();

@@ -1,3 +1,1 @@
-# RegEx to exclude given package:
-edu.illinois.i3.htrc.registry.entities.workset.Tags=keep
-edu.illinois.i3.htrc.registry.entities.workset.Volumes=keep
+/.*/=keep

@@ -32,7 +32,8 @@ public class FileUtils {
     public static URI getFileUri(String resPath) {
         try {
             return new URI(resPath);
-        } catch (URISyntaxException e) {
+        }
+        catch (URISyntaxException e) {
             return null;
         }
     }
@@ -40,32 +41,38 @@ public class FileUtils {
     /**
      * Return an {@link Entry} representing file/folder metadata for a resource
      *
-     * @param resource The file/folder resource
+     * @param resource  The file/folder resource
      * @param filesPath The base path for files
-     * @param baseUri The request base URI
+     * @param baseUri   The request base URI
      * @return The entry bean representing the file/folder
      * @throws RegistryException Thrown if an error occurs when accessing the registry
      */
     public static Entry getEntryForResource(Resource resource, String filesPath, URI baseUri)
-            throws RegistryException {
+        throws RegistryException {
         String resPath = resource.getPath();
         assert (resPath.startsWith(filesPath));
         String relPath = resPath.substring(filesPath.length());
         Entry entry = new Entry();
         if (resource instanceof Collection) {
             entry.setContentType("collection");
-        } else {
+        }
+        else {
             entry.setContentType(resource.getMediaType());
         }
         String parentPath =
-                relPath.isEmpty() ? null : relPath.substring(0, relPath.lastIndexOf("/") + 1);
+            relPath.isEmpty() ? null : relPath.substring(0, relPath.lastIndexOf("/") + 1);
         entry.setParentPath(parentPath);
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(resource.getCreatedTime());
         entry.setCreatedTime(calendar);
+
+        calendar = Calendar.getInstance();
         calendar.setTime(resource.getLastModified());
         entry.setLastModified(calendar);
+
         entry.setAuthor(resource.getAuthorUserName());
+        entry.setLastModifiedBy(resource.getLastUpdaterUserName());
         entry.setDescription(resource.getDescription());
         String name = parentPath == null ? "/" : relPath.substring(parentPath.length());
         entry.setName(name);
@@ -79,34 +86,38 @@ public class FileUtils {
      * Construct metadata for a hierarchical file/folder tree
      *
      * @param filesPath The path to the file space
-     * @param path The root path to start at
-     * @param registry The registry instance
-     * @param baseUri The request base URI
+     * @param path      The root path to start at
+     * @param registry  The registry instance
+     * @param baseUri   The request base URI
      * @param recursive True to recurse into subdirectories, False otherwise
      * @return The hierarchical metadata
      * @throws RegistryException Thrown if an error occurs when accessing the registry
      */
-    public static Entry treeWalk(String filesPath, String path, UserRegistry registry, URI baseUri,
-            boolean recursive) throws RegistryException {
-        return treeWalk(filesPath, path, null, null, registry, baseUri, recursive);
+    public static Entry treeWalk(
+        String filesPath, String path, UserRegistry registry, URI baseUri,
+        boolean recursive) throws RegistryException {
+        return treeWalk(
+            filesPath, path, null, null, registry, baseUri, recursive
+        );
     }
 
     /**
      * Construct metadata for a hierarchical file/folder tree
      *
-     * @param filesPath The path to the file space
-     * @param path The root path to start at
-     * @param fileNamePattern Only include entries whose file name matches this regexp
+     * @param filesPath        The path to the file space
+     * @param path             The root path to start at
+     * @param fileNamePattern  Only include entries whose file name matches this regexp
      * @param mediaTypePattern Only include entries whose media type matches this regexp
-     * @param registry The registry instance
-     * @param baseUri The request base URI
-     * @param recursive True to recurse into subdirectories, False otherwise
+     * @param registry         The registry instance
+     * @param baseUri          The request base URI
+     * @param recursive        True to recurse into subdirectories, False otherwise
      * @return The hierarchical metadata
      * @throws RegistryException Thrown if an error occurs when accessing the registry
      */
-    public static Entry treeWalk(String filesPath, String path, Pattern fileNamePattern,
-            Pattern mediaTypePattern, UserRegistry registry, URI baseUri, boolean recursive)
-            throws RegistryException {
+    public static Entry treeWalk(
+        String filesPath, String path, Pattern fileNamePattern,
+        Pattern mediaTypePattern, UserRegistry registry, URI baseUri, boolean recursive)
+        throws RegistryException {
         Resource resource = registry.get(path);
         Entry entry = getEntryForResource(resource, filesPath, baseUri);
         if (resource instanceof Collection) {
@@ -115,14 +126,16 @@ public class FileUtils {
             for (String child : folder.getChildren()) {
                 Entry childEntry = null;
                 if (recursive) {
-                    childEntry = treeWalk(filesPath, child, fileNamePattern, mediaTypePattern,
-                            registry,
-                            baseUri, recursive);
-                } else {
+                    childEntry = treeWalk(
+                        filesPath, child, fileNamePattern, mediaTypePattern,
+                        registry, baseUri, recursive
+                    );
+                }
+                else {
                     Resource childResource = registry.get(child);
                     childEntry = getEntryForResource(childResource, filesPath, baseUri);
                     if (!(childResource instanceof Collection) &&
-                            !filterMatches(childEntry, fileNamePattern, mediaTypePattern)) {
+                        !filterMatches(childEntry, fileNamePattern, mediaTypePattern)) {
                         childEntry = null;
                     }
                 }
@@ -133,7 +146,8 @@ public class FileUtils {
             }
 
             entry.setEntries(folderEntries);
-        } else if (!filterMatches(entry, fileNamePattern, mediaTypePattern)) {
+        }
+        else if (!filterMatches(entry, fileNamePattern, mediaTypePattern)) {
             entry = null;
         }
 
@@ -143,28 +157,31 @@ public class FileUtils {
     /**
      * Check whether an entry matches the given filters
      *
-     * @param entry The entry metadata
-     * @param fileNamePattern The file name regexp
+     * @param entry            The entry metadata
+     * @param fileNamePattern  The file name regexp
      * @param mediaTypePattern The media type regexp
      * @return True if the entry matches, False otherwise
      */
-    public static boolean filterMatches(Entry entry, Pattern fileNamePattern,
-            Pattern mediaTypePattern) {
-        return filterMatches(entry.getName(), entry.getContentType(), fileNamePattern,
-                mediaTypePattern);
+    public static boolean filterMatches(
+        Entry entry, Pattern fileNamePattern,
+        Pattern mediaTypePattern) {
+        return filterMatches(
+            entry.getName(), entry.getContentType(), fileNamePattern, mediaTypePattern
+        );
     }
 
     /**
      * Check whether the given fileName and mediaType match the given filters
      *
-     * @param fileName The file name
-     * @param mediaType The file media type
-     * @param fileNamePattern The file name regexp
+     * @param fileName         The file name
+     * @param mediaType        The file media type
+     * @param fileNamePattern  The file name regexp
      * @param mediaTypePattern The media type regexp
      * @return True if match successful, False otherwise
      */
-    public static boolean filterMatches(String fileName, String mediaType, Pattern fileNamePattern,
-            Pattern mediaTypePattern) {
+    public static boolean filterMatches(
+        String fileName, String mediaType, Pattern fileNamePattern,
+        Pattern mediaTypePattern) {
         if (fileNamePattern != null && !fileNamePattern.matcher(fileName).matches()) {
             return false;
         }

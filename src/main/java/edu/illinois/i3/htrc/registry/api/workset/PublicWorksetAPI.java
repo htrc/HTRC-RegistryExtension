@@ -16,10 +16,10 @@ import javax.ws.rs.core.Response;
  */
 
 @Produces({
-        HTRCMediaTypes.WORKSET_XML,
-        HTRCMediaTypes.WORKSET_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+    HTRCMediaTypes.WORKSET_XML,
+    HTRCMediaTypes.WORKSET_JSON,
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
 })
 public interface PublicWorksetAPI {
 
@@ -30,7 +30,7 @@ public interface PublicWorksetAPI {
      * @return The retrieved workset
      */
     @GET
-    public Response getPublicWorkset(@QueryParam("author") String author);
+    Response getPublicWorkset(@QueryParam("author") String author);
 
     /**
      * Get access to the API for managing this workset's volumes
@@ -38,7 +38,7 @@ public interface PublicWorksetAPI {
      * @return The {@link VolumesAPI}
      */
     @Path("/volumes")
-    public PublicVolumesAPI getPublicVolumesAPI();
+    PublicVolumesAPI getPublicVolumesAPI();
 
     /**
      * GET: Retrieve a workset's metadata
@@ -48,7 +48,7 @@ public interface PublicWorksetAPI {
      */
     @GET
     @Path("/metadata")
-    public Response getPublicWorksetMeta(@QueryParam("author") String author);
+    Response getPublicWorksetMeta(@QueryParam("author") String author);
 
     /**
      * Get access to the API for managing this workset's tags
@@ -56,6 +56,6 @@ public interface PublicWorksetAPI {
      * @return The {@link TagsAPI}
      */
     @Path("/tags")
-    public TagsAPI getTagsAPI();
+    TagsAPI getTagsAPI();
 
 }

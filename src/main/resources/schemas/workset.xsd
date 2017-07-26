@@ -1,63 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://registry.htrc.i3.illinois.edu/entities/workset"
-	xmlns:tns="http://registry.htrc.i3.illinois.edu/entities/workset"
-	elementFormDefault="qualified">
+    xmlns:workset="http://registry.htrc.i3.illinois.edu/entities/workset"
+    targetNamespace="http://registry.htrc.i3.illinois.edu/entities/workset"
+    elementFormDefault="qualified">
 
-    <include schemaLocation="comment.xsd" />
-    <include schemaLocation="tag.xsd" />
-    <include schemaLocation="volume.xsd" />
+    <include schemaLocation="tag.xsd"/>
+    <include schemaLocation="volume.xsd"/>
 
-	<complexType name="WorksetMeta">
-		<sequence>
-			<element name="version" type="long" minOccurs="0" />
-			<element name="name" type="string" />
-			<element name="description" type="string" />
-			<element name="author" type="string" minOccurs="0" />
-			<element name="rating" minOccurs="0">
-                <simpleType>
-                    <restriction base="int">
-                        <minInclusive value="0" />
-                        <maxInclusive value="5" />
-                    </restriction>
-                </simpleType>
-			</element>
-			<element name="avgRating" type="float" minOccurs="0" />
-			<element name="lastModified" type="dateTime" minOccurs="0" />
-			<element name="lastModifiedBy" type="string" minOccurs="0" />
-			<element ref="tns:tags" minOccurs="0" />
-			<element ref="tns:comments" minOccurs="0" />
-			<element name="volumeCount" type="int" minOccurs="0" />
-			<element name="public" type="boolean" minOccurs="0" />
-		</sequence>
-	</complexType>
-
-	<complexType name="WorksetContent">
-		<sequence>
-			<element ref="tns:volumes" />
-		</sequence>
-	</complexType>
-
-	<complexType name="Workset">
-		<sequence>
-			<element name="metadata" type="tns:WorksetMeta" />
-			<element name="content" type="tns:WorksetContent" minOccurs="0" />
-		</sequence>
-	</complexType>
-
-	<complexType name="Worksets">
+    <complexType name="WorksetMeta">
         <sequence>
-            <element ref="tns:workset" minOccurs="0" maxOccurs="unbounded" />
+            <element name="name" type="string"/>
+            <element name="description" type="string"/>
+            <element minOccurs="0" name="author" type="string"/>
+            <element minOccurs="0" name="created" type="dateTime"/>
+            <element minOccurs="0" name="lastModified" type="dateTime"/>
+            <element minOccurs="0" name="lastModifiedBy" type="string"/>
+            <element minOccurs="0" ref="workset:tags"/>
+            <element minOccurs="0" name="volumeCount" type="int"/>
+            <element minOccurs="0" name="public" type="boolean"/>
         </sequence>
-	</complexType>
+    </complexType>
 
-	<element name="workset" type="tns:Workset">
-		<unique name="TagUnique">
-			<selector xpath="tns:metadata/tns:tags/tns:tag" />
-			<field xpath="." />
-		</unique>
-	</element>
+    <complexType name="WorksetContent">
+        <sequence>
+            <element ref="workset:volumes"/>
+        </sequence>
+    </complexType>
 
-	<element name="worksets" type="tns:Worksets" />
+    <complexType name="Workset">
+        <sequence>
+            <element name="metadata" type="workset:WorksetMeta"/>
+            <element minOccurs="0" name="content" type="workset:WorksetContent"/>
+        </sequence>
+    </complexType>
 
+    <complexType name="Worksets">
+        <sequence>
+            <element minOccurs="0" maxOccurs="unbounded" ref="workset:workset"/>
+        </sequence>
+    </complexType>
+
+    <element name="workset" type="workset:Workset">
+        <unique name="TagUnique">
+            <selector xpath="workset:metadata/workset:tags/workset:tag"/>
+            <field xpath="."/>
+        </unique>
+    </element>
+
+    <element name="worksets" type="workset:Worksets"/>
 </schema>

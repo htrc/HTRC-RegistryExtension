@@ -31,18 +31,18 @@ public class TagsAPIImpl implements TagsAPI {
     private final String _userName;
     private final RegistryExtensionConfig _config;
 
-    public TagsAPIImpl(String worksetId, UserRegistry registry,
-            RegistryExtension registryExtension) {
+    public TagsAPIImpl(String worksetId, UserRegistry registry) {
         _worksetId = worksetId;
         _registry = registry;
         _userName = registry.getUserName();
-        _config = registryExtension.getConfig();
+        _config = RegistryExtension.getConfig();
     }
 
     @GET
     public Response getTags(@QueryParam("author") String author) {
         Log.debug(
-                String.format("getTags: id=%s, author=%s, user=%s", _worksetId, author, _userName));
+            String.format("getTags: id=%s, author=%s, user=%s", _worksetId, author, _userName)
+        );
 
         try {
             if (author == null) {
@@ -52,9 +52,11 @@ public class TagsAPIImpl implements TagsAPI {
 
             if (!RegistryUtils.isAuthorized(resPath, _registry, ActionConstants.GET)) {
                 throw new AuthorizationFailedException(
-                        String.format("User %s is not authorized to read the resource %s.",
-                                _userName,
-                                resPath));
+                    String.format(
+                        "User %s is not authorized to read the resource %s.",
+                        _userName,
+                        resPath
+                    ));
             }
 
             Tags tags = new Tags();
@@ -63,15 +65,18 @@ public class TagsAPIImpl implements TagsAPI {
             }
 
             return Response.ok(tags).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             Log.warn(e.getMessage());
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             Log.error("getTags", e);
             String errorMsg = String.format("Cannot retrieve tags: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();

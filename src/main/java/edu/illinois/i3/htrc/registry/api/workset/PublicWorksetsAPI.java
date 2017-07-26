@@ -16,10 +16,10 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({
-        HTRCMediaTypes.WORKSET_XML,
-        HTRCMediaTypes.WORKSET_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+    HTRCMediaTypes.WORKSET_XML,
+    HTRCMediaTypes.WORKSET_JSON,
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
 })
 public interface PublicWorksetsAPI {
 
@@ -29,7 +29,7 @@ public interface PublicWorksetsAPI {
      * @return The list of public worksets
      */
     @GET
-    public Response getPublicWorksets();
+    Response getPublicWorksets();
 
     /**
      * Get access to a {@link PublicWorksetAPI} instance used to manage individual public worksets
@@ -38,6 +38,6 @@ public interface PublicWorksetsAPI {
      * @return The {@link PublicWorksetAPI}
      */
     @Path("/{id}")
-    public PublicWorksetAPI getPublicWorksetAPI(@PathParam("id") String id);
+    PublicWorksetAPI getPublicWorksetAPI(@PathParam("id") String id);
 
 }

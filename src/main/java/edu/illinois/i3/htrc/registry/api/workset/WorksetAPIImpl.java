@@ -41,25 +41,21 @@ public class WorksetAPIImpl implements WorksetAPI {
     private final String _worksetId;
     private final UserRegistry _registry;
     private final String _userName;
-    private final RegistryExtension _registryExtension;
-    private final RegistryUtils _registryUtils;
     private final RegistryExtensionConfig _config;
 
-    public WorksetAPIImpl(String worksetId, UserRegistry registry,
-            RegistryExtension registryExtension) throws RegistryException {
+    public WorksetAPIImpl(String worksetId, UserRegistry registry) throws RegistryException {
         _worksetId = worksetId;
         _registry = registry;
         _userName = registry.getUserName();
-        _registryExtension = registryExtension;
-        _registryUtils = registryExtension.getRegistryUtils();
-        _config = registryExtension.getConfig();
+        _config = RegistryExtension.getConfig();
     }
 
     @GET
     public Response getWorkset(@QueryParam("author") String author) {
         Log.debug(
-                String.format("getWorkset: id=%s, author=%s, user=%s", _worksetId, author,
-                        _userName));
+            String.format("getWorkset: id=%s, author=%s, user=%s",
+                          _worksetId, author, _userName)
+        );
 
         try {
             if (author == null) {
@@ -75,14 +71,17 @@ public class WorksetAPIImpl implements WorksetAPI {
             Workset workset = WorksetUtils.getWorksetFromResource(resource, _registry);
 
             return Response.ok(workset).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (RegistryException e) {
+                           .build();
+        }
+        catch (RegistryException e) {
             Log.error("getWorkset", e);
             String errorMsg = String.format("Cannot retrieve workset: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -91,13 +90,17 @@ public class WorksetAPIImpl implements WorksetAPI {
 
     @PUT
     @Consumes({
-            HTRCMediaTypes.WORKSET_XML,
-            HTRCMediaTypes.WORKSET_JSON
+        HTRCMediaTypes.WORKSET_XML,
+        HTRCMediaTypes.WORKSET_JSON
     })
-    public Response updateWorkset(Workset workset,
-            @DefaultValue("false") @QueryParam("public") boolean isPublic) {
-        Log.debug(String.format("updateWorkset: id=%s, public=%s, user=%s", _worksetId, isPublic,
-                _userName));
+    public Response updateWorkset(
+        Workset workset,
+        @DefaultValue("false") @QueryParam("public") boolean isPublic) {
+
+        Log.debug(
+            String.format("updateWorkset: id=%s, public=%s, user=%s",
+                          _worksetId, isPublic, _userName)
+        );
 
         WorksetMeta worksetMeta = workset.getMetadata();
         WorksetContent worksetContent = workset.getContent();
@@ -106,13 +109,13 @@ public class WorksetAPIImpl implements WorksetAPI {
         if (!WorksetUtils.isLegalWorksetName(worksetName)) {
             String errorMsg = "Illegal workset name: " + worksetName;
             return Response.status(Status.BAD_REQUEST).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
+                           .build();
         }
 
         if (!_worksetId.equalsIgnoreCase(worksetMeta.getName())) {
             Log.warn(String.format(
-                    "API call for workset name '%s' does not match payload workset name '%s'",
-                    _worksetId, worksetMeta.getName()));
+                "API call for workset name '%s' does not match payload workset name '%s'",
+                _worksetId, worksetMeta.getName()));
         }
 
         try {
@@ -128,35 +131,40 @@ public class WorksetAPIImpl implements WorksetAPI {
                     // Update
                     Log.debug("Updating workset");
                     resource.setDescription(worksetMeta.getDescription());
-                } else {
+                }
+                else {
                     // Replace
                     Log.debug("Replacing workset");
                     resource = WorksetUtils.createResourceFromWorkset(workset, _registry);
                 }
 
                 resPath = _registry.put(resPath, resource);
-                workset.setMetadata(WorksetUtils
-                        .updateResourceCommunityMeta(resource, worksetMeta, _registry,
-                                _registryUtils));
+                WorksetMeta updatedMeta =
+                    WorksetUtils.updateResourceCommunityMeta(resource, worksetMeta, _registry);
+                workset.setMetadata(updatedMeta);
 
                 if (isPublic) {
                     RegistryUtils.authorizeEveryone(resPath, _registry, ActionConstants.GET);
-                } else {
+                }
+                else {
                     RegistryUtils.denyEveryone(resPath, _registry, ActionConstants.GET);
                 }
 
                 _registry.commitTransaction();
 
                 return Response.ok(workset).build();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 _registry.rollbackTransaction();
                 throw e;
             }
-        } catch (ResourceNotFoundException e) {
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (Exception e) {
+                           .build();
+        }
+        catch (Exception e) {
             Log.error("updateWorkset", e);
             String errorMsg = String.format("Cannot update workset: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -178,7 +186,8 @@ public class WorksetAPIImpl implements WorksetAPI {
             _registry.delete(resPath);
 
             return Response.noContent().build();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Log.error("deleteWorkset", e);
             String errorMsg = String.format("Cannot delete workset: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -187,14 +196,16 @@ public class WorksetAPIImpl implements WorksetAPI {
 
     @Path("/volumes")
     public VolumesAPI getVolumesAPI() {
-        return new VolumesAPIImpl(_worksetId, _registry, _registryExtension);
+        return new VolumesAPIImpl(_worksetId, _registry);
     }
 
     @GET
     @Path("/metadata")
     public Response getWorksetMeta(@QueryParam("author") String author) {
-        Log.debug(String.format("getWorksetMeta: id=%s, author=%s, user=%s", _worksetId, author,
-                _userName));
+        Log.debug(
+            String.format("getWorksetMeta: id=%s, author=%s, user=%s",
+                          _worksetId, author, _userName)
+        );
 
         try {
             if (author == null) {
@@ -212,14 +223,17 @@ public class WorksetAPIImpl implements WorksetAPI {
             workset.setMetadata(worksetMeta);
 
             return Response.ok(workset).build();
-        } catch (AuthorizationFailedException e) {
+        }
+        catch (AuthorizationFailedException e) {
             return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
-                    .type(MediaType.TEXT_PLAIN).build();
-        } catch (ResourceNotFoundException e) {
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
             String errorMsg = "Unable to locate workset: " + _worksetId;
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                    .build();
-        } catch (RegistryException e) {
+                           .build();
+        }
+        catch (RegistryException e) {
             Log.error("getWorksetMeta", e);
             String errorMsg = String.format("Cannot retrieve workset meta: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -228,7 +242,7 @@ public class WorksetAPIImpl implements WorksetAPI {
 
     @Path("/tags")
     public TagsAPI getTagsAPI() {
-        return new TagsAPIImpl(_worksetId, _registry, _registryExtension);
+        return new TagsAPIImpl(_worksetId, _registry);
     }
 
 }

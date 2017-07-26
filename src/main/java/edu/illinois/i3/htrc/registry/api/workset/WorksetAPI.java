@@ -20,10 +20,10 @@ import javax.ws.rs.core.Response;
  */
 
 @Produces({
-        HTRCMediaTypes.WORKSET_XML,
-        HTRCMediaTypes.WORKSET_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+    HTRCMediaTypes.WORKSET_XML,
+    HTRCMediaTypes.WORKSET_JSON,
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
 })
 public interface WorksetAPI {
 
@@ -34,23 +34,24 @@ public interface WorksetAPI {
      * @return The retrieved workset
      */
     @GET
-    public Response getWorkset(@QueryParam("author") String author);
+    Response getWorkset(@QueryParam("author") String author);
 
     /**
      * PUT: Update/replace a workset
      *
-     * @param workset The new workset
+     * @param workset  The new workset
      * @param isPublic True to mark this workset as "public" (shared with everyone), False
-     * otherwise
+     *                 otherwise
      * @return 200 if successful, error otherwise
      */
     @PUT
     @Consumes({
-            HTRCMediaTypes.WORKSET_XML,
-            HTRCMediaTypes.WORKSET_JSON
+        HTRCMediaTypes.WORKSET_XML,
+        HTRCMediaTypes.WORKSET_JSON
     })
-    public Response updateWorkset(Workset workset,
-            @DefaultValue("false") @QueryParam("public") boolean isPublic);
+    Response updateWorkset(
+        Workset workset,
+        @DefaultValue("false") @QueryParam("public") boolean isPublic);
 
     /**
      * DELETE: Delete a workset
@@ -59,7 +60,7 @@ public interface WorksetAPI {
      */
     @DELETE
     @Produces(MediaType.WILDCARD)
-    public Response deleteWorkset();
+    Response deleteWorkset();
 
     /**
      * Get access to the API for managing this workset's volumes
@@ -67,7 +68,7 @@ public interface WorksetAPI {
      * @return The {@link VolumesAPI}
      */
     @Path("/volumes")
-    public VolumesAPI getVolumesAPI();
+    VolumesAPI getVolumesAPI();
 
     /**
      * GET: Retrieve a workset's metadata
@@ -77,7 +78,7 @@ public interface WorksetAPI {
      */
     @GET
     @Path("/metadata")
-    public Response getWorksetMeta(@QueryParam("author") String author);
+    Response getWorksetMeta(@QueryParam("author") String author);
 
     /**
      * Get access to the API for managing this workset's tags
@@ -85,6 +86,6 @@ public interface WorksetAPI {
      * @return The {@link TagsAPI}
      */
     @Path("/tags")
-    public TagsAPI getTagsAPI();
+    TagsAPI getTagsAPI();
 
 }

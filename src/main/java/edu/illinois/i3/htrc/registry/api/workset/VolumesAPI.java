@@ -17,10 +17,10 @@ import javax.ws.rs.core.Response;
  */
 
 @Produces({
-        HTRCMediaTypes.VOLUME_XML,
-        HTRCMediaTypes.VOLUME_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.APPLICATION_JSON
+    HTRCMediaTypes.VOLUME_XML,
+    HTRCMediaTypes.VOLUME_JSON,
+    MediaType.APPLICATION_XML,
+    MediaType.APPLICATION_JSON
 })
 public interface VolumesAPI {
 
@@ -32,7 +32,7 @@ public interface VolumesAPI {
      */
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getVolumesAsPlainText(@QueryParam("author") String author);
+    Response getVolumesAsPlainText(@QueryParam("author") String author);
 
     /**
      * GET: Retrieve workset volumes as CSV
@@ -42,7 +42,7 @@ public interface VolumesAPI {
      */
     @GET
     @Produces(HTRCMediaTypes.TEXT_CSV)
-    public Response getVolumesAsCSV(@QueryParam("author") String author);
+    Response getVolumesAsCSV(@QueryParam("author") String author);
 
     /**
      * GET: Retrieve the workset volumes as XML or JSON
@@ -51,7 +51,7 @@ public interface VolumesAPI {
      * @return The workset volumes
      */
     @GET
-    public Response getVolumes(@QueryParam("author") String author);
+    Response getVolumes(@QueryParam("author") String author);
 
     /**
      * PUT: Replace the volumes of a workset
@@ -61,9 +61,9 @@ public interface VolumesAPI {
      */
     @PUT
     @Consumes({
-            HTRCMediaTypes.VOLUME_XML,
-            HTRCMediaTypes.VOLUME_JSON
+        HTRCMediaTypes.VOLUME_XML,
+        HTRCMediaTypes.VOLUME_JSON
     })
-    public Response replaceVolumes(Volumes volumes);
+    Response replaceVolumes(Volumes volumes);
 
 }

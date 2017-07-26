@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://java.sun.com/xml/ns/javaee"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	version="2.5">
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
 
-	<display-name>HTRC Extension API ${version}</display-name>
+    <display-name>HTRC Extension API ${version}</display-name>
 
     <!--
     <context-param>
@@ -14,43 +14,78 @@
     </context-param>
     -->
 
-	<listener>
-		<listener-class>edu.illinois.i3.htrc.registry.api.RegistryExtension</listener-class>
-	</listener>
+    <context-param>
+        <param-name>publicWorksetsPathQuery</param-name>
+        <param-value>
+            SELECT
+                CONCAT(rp.REG_PATH_VALUE, "/", rr.REG_NAME) AS WS_PATH
+            FROM
+                REG_PATH rp
+                JOIN REG_RESOURCE rr USING (REG_PATH_ID)
+                JOIN UM_PERMISSION up ON up.UM_RESOURCE_ID = CONCAT(rp.REG_PATH_VALUE, "/", rr.REG_NAME)
+                JOIN UM_ROLE_PERMISSION urp ON up.UM_ID = urp.UM_PERMISSION_ID
+            WHERE
+                rr.REG_NAME IS NOT NULL
+                AND rp.REG_PATH_VALUE LIKE ?
+                AND urp.UM_IS_ALLOWED = 1
+                AND urp.UM_ROLE_NAME = ?
+                AND up.UM_ACTION = ?
+            ORDER BY
+                rr.REG_NAME
+        </param-value>
+    </context-param>
 
-	<servlet>
-		<description>RegExt Private API</description>
-		<servlet-name>CXFServletPrivate</servlet-name>
-		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
-		<init-param>
-			<param-name>config-location</param-name>
-			<param-value>WEB-INF/cxf-servlet-private.xml</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+    <listener>
+        <listener-class>edu.illinois.i3.htrc.registry.api.RegistryExtension</listener-class>
+    </listener>
 
-	<servlet>
-		<description>RegExt Public API</description>
-		<servlet-name>CXFServletPublic</servlet-name>
-		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
-		<init-param>
-			<param-name>config-location</param-name>
-			<param-value>WEB-INF/cxf-servlet-public.xml</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
+    <filter>
+        <filter-name>JWTFilter</filter-name>
+        <filter-class>edu.indiana.d2i.htrc.security.JWTServletFilter</filter-class>
+        <init-param>
+            <param-name>htrc.jwtfilter.config</param-name>
+            <param-value>${htrc.jwtfilter.config}</param-value>
+        </init-param>
+    </filter>
 
-	<servlet-mapping>
-		<servlet-name>CXFServletPrivate</servlet-name>
-		<url-pattern>${api.ctx.base}/*</url-pattern>
-	</servlet-mapping>
+    <filter-mapping>
+        <filter-name>JWTFilter</filter-name>
+        <servlet-name>CXFServletPrivate</servlet-name>
+    </filter-mapping>
 
-	<servlet-mapping>
-		<servlet-name>CXFServletPublic</servlet-name>
-		<url-pattern>${public.api.ctx.base}/*</url-pattern>
-	</servlet-mapping>
+    <servlet>
+        <description>RegExt Private API</description>
+        <servlet-name>CXFServletPrivate</servlet-name>
+        <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+        <init-param>
+            <param-name>config-location</param-name>
+            <param-value>WEB-INF/cxf-servlet-private.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
-	<session-config>
-		<session-timeout>${session.timeout}</session-timeout>
-	</session-config>
+    <servlet>
+        <description>RegExt Public API</description>
+        <servlet-name>CXFServletPublic</servlet-name>
+        <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+        <init-param>
+            <param-name>config-location</param-name>
+            <param-value>WEB-INF/cxf-servlet-public.xml</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>CXFServletPrivate</servlet-name>
+        <url-pattern>${api.ctx.base}/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>CXFServletPublic</servlet-name>
+        <url-pattern>${public.api.ctx.base}/*</url-pattern>
+    </servlet-mapping>
+
+    <session-config>
+        <session-timeout>${session.timeout}</session-timeout>
+    </session-config>
 </web-app>
