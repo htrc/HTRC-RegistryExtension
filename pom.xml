@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.illinois.i3.htrc.registry</groupId>
     <artifactId>ExtensionAPI</artifactId>
@@ -88,7 +90,8 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <generateDirectory>${project.build.directory}/generated-sources</generateDirectory>
+                            <generateDirectory>${project.build.directory}/generated-sources
+                            </generateDirectory>
                             <schemaDirectory>${basedir}/src/main/resources/schemas</schemaDirectory>
                             <removeOldOutput>false</removeOldOutput>
                             <episode>false</episode>
@@ -97,7 +100,9 @@
                                 <arg>-no-header</arg>
                                 <arg>-Xxew</arg>
                                 <arg>-Xxew:instantiate lazy</arg>
-                                <arg>-Xxew:control ${basedir}/src/main/resources/schemas/control.txt</arg>
+                                <arg>-Xxew:control
+                                    ${basedir}/src/main/resources/schemas/control.txt
+                                </arg>
                             </args>
                             <plugins>
                                 <plugin>
@@ -119,7 +124,7 @@
                     <execution>
                         <goals>
                             <goal>revision</goal>
-                         </goals>
+                        </goals>
                     </execution>
                 </executions>
 
@@ -138,9 +143,17 @@
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <filters>
-                        <filter>${basedir}/src/main/filters/${webapp.filter}.properties</filter>
+                        <filter>src/main/filters/${webapp.filter}.properties</filter>
                     </filters>
                     <packagingExcludes>WEB-INF/lib/log4j*.jar</packagingExcludes>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp/WEB-INF</directory>
+                            <filtering>true</filtering>
+                            <includes>jwtfilter.conf</includes>
+                            <targetPath>WEB-INF</targetPath>
+                        </resource>
+                    </webResources>
                     <archive>
                         <manifestEntries>
                             <Git-Sha>${git.commit.id}</Git-Sha>
@@ -164,7 +177,8 @@
                         </goals>
                         <phase>site</phase>
                         <configuration>
-                            <message>Creating site for ${project.artifactId}-${project.version}</message>
+                            <message>Creating site for ${project.artifactId}-${project.version}
+                            </message>
                             <!-- repository identification -->
                             <repositoryName>${github.repo.name}</repositoryName>
                             <repositoryOwner>htrc</repositoryOwner>
@@ -198,7 +212,8 @@
 
     <scm>
         <connection>scm:git:${public.code.repo}/${github.repo.name}.git</connection>
-        <developerConnection>scm:git:${developer.code.repo}/${github.repo.name}.git</developerConnection>
+        <developerConnection>scm:git:${developer.code.repo}/${github.repo.name}.git
+        </developerConnection>
         <url>https://github.com/htrc/${github.repo.name}</url>
         <tag>HEAD</tag>
     </scm>
