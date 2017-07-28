@@ -1,11 +1,16 @@
 package edu.illinois.i3.htrc.registry.api.file;
 
+import edu.illinois.i3.htrc.registry.api.HTRCMediaTypes;
+import edu.illinois.i3.htrc.registry.api.RegistryExtension;
+import edu.illinois.i3.htrc.registry.api.RegistryExtensionConfig;
+import edu.illinois.i3.htrc.registry.api.utils.FileUtils;
+import edu.illinois.i3.htrc.registry.api.utils.RegistryUtils;
+import edu.illinois.i3.htrc.registry.entities.file.Entry;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -26,7 +31,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -38,437 +42,497 @@ import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
-
-import edu.illinois.i3.htrc.registry.api.HTRCMediaTypes;
-import edu.illinois.i3.htrc.registry.api.RegistryExtension;
-import edu.illinois.i3.htrc.registry.api.RegistryExtensionConfig;
-import edu.illinois.i3.htrc.registry.api.utils.FileUtils;
-import edu.illinois.i3.htrc.registry.api.utils.RegistryUtils;
-import edu.illinois.i3.htrc.registry.entities.file.Entry;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 /**
  * JAX-RS implementation for {@link FilesAPI}
  *
  * @author capitanu
- *
  */
 public class FilesAPIImpl implements FilesAPI {
 
-	private static final Log Log = LogFactory.getLog(FilesAPIImpl.class);
+    private static final Log Log = LogFactory.getLog(FilesAPIImpl.class);
 
-	protected RegistryExtension _registryExtension;
-	protected RegistryUtils _registryUtils;
-	protected RegistryExtensionConfig _config;
+    protected @Context
+    HttpServletRequest _request;
 
-	/**
-	 * Injected ServletContext
-	 *
-	 * @param context The servlet context
-	 */
-	@javax.annotation.Resource
-	public void setServletContext(ServletContext context) {
-		_registryExtension = (RegistryExtension)context.getAttribute(RegistryExtension.class.getName());
-		_registryUtils = _registryExtension.getRegistryUtils();
-		_config = _registryExtension.getConfig();
-	}
+    protected @HeaderParam("X-Auth-Username")
+    String debugUserName;
 
-	@OPTIONS
-	@Path("{path:.*}")
-	@Produces({
-		HTRCMediaTypes.ENTRY_XML,
-		HTRCMediaTypes.ENTRY_JSON,
-		MediaType.APPLICATION_XML,
-		MediaType.APPLICATION_JSON
-	})
-	public Response listContents(
-			@Context HttpServletRequest request,
-			@Context UriInfo uriInfo,
-			@PathParam("path") String path,
-			@DefaultValue("false") @QueryParam("recursive") boolean recursive,
-			@DefaultValue(".*") @QueryParam("name") String nameFilterRegexp,
-			@DefaultValue(".*") @QueryParam("type") String typeFilterRegexp,
-			@DefaultValue("false") @QueryParam("public") boolean listPublic) {
+    protected RegistryExtensionConfig _config;
 
-		String userName = request.getRemoteUser();
+    /**
+     * Injected ServletContext
+     *
+     * @param context The servlet context
+     */
+    @javax.annotation.Resource
+    public void setServletContext(ServletContext context) {
+        _config = RegistryExtension.getConfig();
+    }
 
-		if (userName != null) {
-			userName = MultitenantUtils.getTenantAwareUsername(userName);
-		}
+    @OPTIONS
+    @Path("{path:.*}")
+    @Produces({
+        HTRCMediaTypes.ENTRY_XML,
+        HTRCMediaTypes.ENTRY_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.APPLICATION_JSON
+    })
+    public Response listContents(
+        @Context HttpServletRequest request,
+        @Context UriInfo uriInfo,
+        @PathParam("path") String path,
+        @DefaultValue("false") @QueryParam("recursive") boolean recursive,
+        @DefaultValue(".*") @QueryParam("name") String nameFilterRegexp,
+        @DefaultValue(".*") @QueryParam("type") String typeFilterRegexp,
+        @DefaultValue("false") @QueryParam("public") boolean listPublic) {
 
-		if (!path.startsWith("/")) path = "/" + path;
+        String userName = getAuthenticatedUser();
 
-		Log.debug(String.format("listContents: path=%s, nameFilter=%s, typeFilter=%s, recursive=%s, public=%s, user=%s",
-				path, nameFilterRegexp, typeFilterRegexp, recursive, listPublic, userName));
-
-		if (userName == null)
-			return Response.status(Status.UNAUTHORIZED).entity("Not authenticated").type(MediaType.TEXT_PLAIN).build();
-
-		String filesPath = listPublic ? _config.getPublicFilesPath() : _config.getUserFilesPath(userName);
-		String resPath = filesPath + path;
-
-		try {
-			Pattern fileNamePattern = Pattern.compile(nameFilterRegexp);
-			Pattern mediaTypePattern = Pattern.compile(typeFilterRegexp);
-
-			UserRegistry registry = _registryUtils.getUserRegistry(userName);
-			if (!registry.resourceExists(resPath))
-				return Response.status(Status.NOT_FOUND).build();
-
-			Entry entry = FileUtils.treeWalk(filesPath, resPath, fileNamePattern, mediaTypePattern, registry, uriInfo.getBaseUri(), recursive);
-			if (entry != null)
-				return Response.ok(entry).build();
-			else
-				return Response.noContent().build();
-		}
-		catch (PatternSyntaxException e) {
-			return Response.status(Status.BAD_REQUEST).entity("Regexp syntax error: " + e.getMessage()).type(MediaType.TEXT_PLAIN).build();
-		}
-		catch (Exception e) {
-			Log.error("listContents", e);
-			String errorMsg = String.format("Cannot list contents for: %s\n%s", path, e.toString());
-			return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
-		}
-	}
-
-	@HEAD
-	@Path("{path:.*}")
-	public Response checkIfExists(
-			@Context HttpServletRequest request,
-			@PathParam("path") String path,
-			@DefaultValue("false") @QueryParam("public") boolean checkPublic) {
-
-		String userName = request.getRemoteUser();
-
-		if (userName != null) {
-			userName = MultitenantUtils.getTenantAwareUsername(userName);
-		}
-
-		if (!path.startsWith("/")) path = "/" + path;
-		Log.debug(String.format("checkIfExists: path=%s, public=%s, user=%s", path, checkPublic, userName));
-
-		if (userName == null)
-			return Response.status(Status.UNAUTHORIZED).entity("Not authenticated").type(MediaType.TEXT_PLAIN).build();
-
-		String filesPath = checkPublic ? _config.getPublicFilesPath() : _config.getUserFilesPath(userName);
-		String resPath = filesPath + path;
-
-		try {
-			UserRegistry registry = _registryUtils.getUserRegistry(userName);
-			if (registry.resourceExists(resPath)) {
-				Resource resource = registry.get(resPath);
-				String type = (resource instanceof Collection) ? "collection" : resource.getMediaType();
-				return Response.ok().type(type).build();
-			} else
-				return Response.status(Status.NOT_FOUND).build();
-		}
-		catch (Exception e) {
-			Log.error("checkIfExists", e);
-			String errorMsg = String.format("Cannot verify existence of: %s\n%s", path, e.toString());
-			return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
-		}
-	}
-
-	@GET
-	@Path("{path:.*}")
-	public Response getFileOrFolder(
-			@Context HttpServletRequest request,
-			@PathParam("path") String path,
-			@DefaultValue(".*") @QueryParam("name") String nameFilterRegexp,
-			@DefaultValue(".*") @QueryParam("type") String typeFilterRegexp,
-			@DefaultValue("false") @QueryParam("public") boolean getPublic) {
-
-		String userName = request.getRemoteUser();
-
-		if (userName != null) {
-			userName = MultitenantUtils.getTenantAwareUsername(userName);
-		}
-
-		if (!path.startsWith("/")) path = "/" + path;
-
-		Log.debug(String.format("getFileOrFolder: path=%s, nameFilter=%s, typeFilter=%s, public=%s, user=%s",
-				path, nameFilterRegexp, typeFilterRegexp, getPublic, userName));
-
-		if (userName == null)
-			return Response.status(Status.UNAUTHORIZED).entity("Not authenticated").type(MediaType.TEXT_PLAIN).build();
-
-		String filesPath = getPublic ? _config.getPublicFilesPath() : _config.getUserFilesPath(userName);
-		String resPath = filesPath + path;
-
-		try {
-			Pattern fileNamePattern = Pattern.compile(nameFilterRegexp);
-			Pattern mediaTypePattern = Pattern.compile(typeFilterRegexp);
-
-			UserRegistry registry = _registryUtils.getUserRegistry(userName);
-			if (!registry.resourceExists(resPath))
-				return Response.status(Status.NOT_FOUND).build();
-
-			Resource resource = registry.get(resPath);
-			String mediaType = resource.getMediaType();
-			if (resource instanceof Collection) {
-				Collection collection = (Collection) resource;
-				List<Attachment> attachments = new ArrayList<Attachment>();
-				for (String child : collection.getChildren()) {
-					try {
-						resource = registry.get(child);
-					} catch (AuthorizationFailedException afe){
-						Log.warn("getFileOrFolder: Registry authorization failure. This should not happen." +
-								" But latest  Registry version's getChildren returns private resources.");
-						continue;
-					}
-
-					if (resource instanceof Collection)
-						continue;
-					String attachmentName = child.substring(child.lastIndexOf("/") + 1);
-					String attachmentType = resource.getMediaType();
-					if (FileUtils.filterMatches(attachmentName, attachmentType, fileNamePattern, mediaTypePattern)) {
-						try {
-							InputStream contentStream = resource.getContentStream();
-							Attachment attachment = new Attachment(attachmentName, attachmentType, contentStream);
-							attachments.add(attachment);
-						}
-						catch (RegistryException e) {
-							Log.warn("getContentStream: " + e.getMessage() + " - " + child);
-							continue;
-						}
-					}
-				}
-
-				if (!attachments.isEmpty()) {
-					MultipartBody multipartBody = new MultipartBody(attachments, true);
-					return Response.ok(multipartBody).type("multipart/mixed").build();
-				} else
-					return Response.noContent().build();
-			}
-
-			return Response.ok(resource.getContentStream(), mediaType).build();
-		}
-		catch (PatternSyntaxException e) {
-			return Response.status(Status.BAD_REQUEST).entity("Regexp syntax error: " + e.getMessage()).type(MediaType.TEXT_PLAIN).build();
-		}
-		catch (Exception e) {
-			Log.error("getFileOrFolder", e);
-			String errorMsg = String.format("Cannot retrieve entry: %s\n%s", path, e.toString());
-			return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
-		}
-	}
-
-	@POST
-	@Path("{path:.*}")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public Response uploadToFolder(
-			@Context HttpServletRequest request,
-			@PathParam("path") String path,
-			@DefaultValue("false") @QueryParam("public") boolean isPublic,
-            @QueryParam("user") String user,
-			List<Attachment> attachments) {
-
-		String userName;
-		String authenticatedUser = request.getRemoteUser();
-
-		if (authenticatedUser != null) {
-			authenticatedUser = MultitenantUtils.getTenantAwareUsername(authenticatedUser);
-		}
-
-		// Allowing uploads to someone else files directory. (Requirement for Agent)
-		// TODO: Check permission of authenticated user.
-        if(user != null && user.length() > 0){
-            userName = user;
-        }else{
-            userName  = authenticatedUser;
+        if (!path.startsWith("/")) {
+            path = "/" + path;
         }
 
-		if (!path.startsWith("/")) path = "/" + path;
-		if (!path.endsWith("/")) path += "/";
-		Log.debug(String.format("uploadToFolder: path=%s, public=%s, user=%s", path, isPublic, userName));
+        Log.debug(String.format(
+            "listContents: path=%s, nameFilter=%s, typeFilter=%s, recursive=%s, public=%s, user=%s",
+            path, nameFilterRegexp, typeFilterRegexp, recursive, listPublic, userName
+        ));
 
-		if (authenticatedUser == null)
-			return Response.status(Status.UNAUTHORIZED).entity("Not authenticated").type(MediaType.TEXT_PLAIN).build();
+        if (userName == null) {
+            return Response.status(Status.UNAUTHORIZED).entity("Not authenticated")
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
 
-		try {
-			UserRegistry registry = _registryUtils.getUserRegistry(userName);
-			String parentPath = _config.getUserFilesPath(userName) + path;
-			String publicFilesPath = _config.getPublicFilesPath();
+        String filesPath =
+            listPublic ? _config.getPublicFilesPath() : _config.getUserFilesPath(userName);
+        String resPath = filesPath + path;
 
-			registry.beginTransaction();
-			try {
-				for (Attachment attachment : attachments) {
-					MediaType contentType = attachment.getContentType();
-					String fileName = attachment.getContentDisposition().getParameter("filename");
-					InputStream fileStream = attachment.getDataHandler().getInputStream();
+        try {
+            Pattern fileNamePattern = Pattern.compile(nameFilterRegexp);
+            Pattern mediaTypePattern = Pattern.compile(typeFilterRegexp);
 
-					Resource fileResource = registry.newResource();
-					fileResource.setMediaType(contentType.toString());
-					fileResource.setContentStream(fileStream);
+            UserRegistry registry = RegistryUtils.getUserRegistry(userName);
+            if (!registry.resourceExists(resPath)) {
+                return Response.status(Status.NOT_FOUND).build();
+            }
 
-					String resPath = parentPath + fileName;
-					resPath = registry.put(resPath, fileResource);
-					Log.debug("Uploaded: " + resPath);
+            Entry entry = FileUtils
+                .treeWalk(filesPath, resPath, fileNamePattern, mediaTypePattern, registry,
+                          uriInfo.getBaseUri(), recursive
+                );
+            if (entry != null) {
+                return Response.ok(entry).build();
+            }
+            else {
+                return Response.noContent().build();
+            }
+        }
+        catch (PatternSyntaxException e) {
+            return Response.status(Status.BAD_REQUEST)
+                           .entity("Regexp syntax error: " + e.getMessage())
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (Exception e) {
+            Log.error("listContents", e);
+            String errorMsg = String.format("Cannot list contents for: %s\n%s", path, e.toString());
+            return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+        }
+    }
 
-					if (isPublic) {
-						RegistryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
-						String symlinkPath = publicFilesPath + path + fileName;
-						Log.debug("Creating symlink: " + symlinkPath + " -> " + resPath);
-						registry.createLink(symlinkPath, resPath);
-					}
-				}
+    @HEAD
+    @Path("{path:.*}")
+    public Response checkIfExists(
+        @Context HttpServletRequest request,
+        @PathParam("path") String path,
+        @DefaultValue("false") @QueryParam("public") boolean checkPublic) {
 
-				registry.commitTransaction();
-			}
-			catch (Exception e) {
-				registry.rollbackTransaction();
-				throw e;
-			}
+        String userName = getAuthenticatedUser();
 
-			return Response.noContent().build();
-		}
-		catch (Exception e) {
-			Log.error("uploadToFolder", e);
-			String errorMsg = String.format("Cannot upload to folder: %s\n%s", path, e.toString());
-			return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
-		}
-	}
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        Log.debug(String.format("checkIfExists: path=%s, public=%s, user=%s", path, checkPublic,
+                                userName
+        ));
 
-	@PUT
-	@Path("{path:.*}")
-	public Response uploadFile(
-			@Context HttpServletRequest request,
-			@HeaderParam("Content-Type") MediaType contentType,
-			@PathParam("path") String path,
-			@DefaultValue("false") @QueryParam("public") boolean isPublic,
-            @QueryParam("user") String user,
-			InputStream fileStream) {
+        if (userName == null) {
+            return Response.status(Status.UNAUTHORIZED).entity("Not authenticated")
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
 
-		String userName;
-		String authenticatedUser = request.getRemoteUser();
+        String filesPath =
+            checkPublic ? _config.getPublicFilesPath() : _config.getUserFilesPath(userName);
+        String resPath = filesPath + path;
 
-		if (authenticatedUser != null) {
-			authenticatedUser = MultitenantUtils.getTenantAwareUsername(authenticatedUser);
-		}
+        try {
+            UserRegistry registry = RegistryUtils.getUserRegistry(userName);
+            if (registry.resourceExists(resPath)) {
+                Resource resource = registry.get(resPath);
+                String type =
+                    (resource instanceof Collection) ? "collection" : resource.getMediaType();
+                return Response.ok().type(type).build();
+            }
+            else {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+        }
+        catch (Exception e) {
+            Log.error("checkIfExists", e);
+            String errorMsg = String
+                .format("Cannot verify existence of: %s\n%s", path, e.toString());
+            return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+        }
+    }
 
-		// Allowing uploads to someone else files directory. (Requirement for Agent)
-		// TODO: Check permission of authenticated user.
-		if (user != null && user.length() > 0) {
-			userName = user;
-		} else {
-			userName  = authenticatedUser;
-		}
+    @GET
+    @Path("{path:.*}")
+    public Response getFileOrFolder(
+        @Context HttpServletRequest request,
+        @PathParam("path") String path,
+        @DefaultValue(".*") @QueryParam("name") String nameFilterRegexp,
+        @DefaultValue(".*") @QueryParam("type") String typeFilterRegexp,
+        @DefaultValue("false") @QueryParam("public") boolean getPublic) {
 
-		if (!path.startsWith("/")) path = "/" + path;
+        String userName = getAuthenticatedUser();
 
-		Log.debug(String.format("uploadFile: path=%s, contentType=%s, public=%s, user=%s", path, contentType, isPublic, userName));
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
 
-		if (authenticatedUser == null)
-			return Response.status(Status.UNAUTHORIZED).entity("Not authenticated").type(MediaType.TEXT_PLAIN).build();
+        Log.debug(String.format(
+            "getFileOrFolder: path=%s, nameFilter=%s, typeFilter=%s, public=%s, user=%s",
+            path, nameFilterRegexp, typeFilterRegexp, getPublic, userName
+        ));
 
-		if (contentType == null)
-			contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+        if (userName == null) {
+            return Response.status(Status.UNAUTHORIZED).entity("Not authenticated")
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
 
-		try {
-			UserRegistry registry = _registryUtils.getUserRegistry(userName);
+        String filesPath =
+            getPublic ? _config.getPublicFilesPath() : _config.getUserFilesPath(userName);
+        String resPath = filesPath + path;
 
-			String tenantAwareUsername = MultitenantUtils.getTenantAwareUsername(userName);
-			String resPath = _config.getUserFilesPath(tenantAwareUsername) + path;
+        try {
+            Pattern fileNamePattern = Pattern.compile(nameFilterRegexp);
+            Pattern mediaTypePattern = Pattern.compile(typeFilterRegexp);
 
-			registry.beginTransaction();
-			try {
-				Resource fileResource = registry.newResource();
-				fileResource.setMediaType(contentType.toString());
-				fileResource.setContentStream(fileStream);
+            UserRegistry registry = RegistryUtils.getUserRegistry(userName);
+            if (!registry.resourceExists(resPath)) {
+                return Response.status(Status.NOT_FOUND).build();
+            }
 
-				resPath = registry.put(resPath, fileResource);
-				Log.debug("Uploaded: " + resPath);
+            Resource resource = registry.get(resPath);
+            String mediaType = resource.getMediaType();
+            if (resource instanceof Collection) {
+                Collection collection = (Collection) resource;
+                List<Attachment> attachments = new ArrayList<Attachment>();
+                for (String child : collection.getChildren()) {
+                    try {
+                        resource = registry.get(child);
+                    }
+                    catch (AuthorizationFailedException afe) {
+                        Log.warn(
+                            "getFileOrFolder: Registry authorization failure. This should not happen."
+                                +
+                                " But latest  Registry version's getChildren returns private resources.");
+                        continue;
+                    }
 
-				if (isPublic) {
-					RegistryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
-					String symlinkPath = _config.getPublicFilesPath() + path;
-					Log.debug("Creating symlink: " + symlinkPath + " -> " + resPath);
-					registry.createLink(symlinkPath, resPath);
-				}
+                    if (resource instanceof Collection) {
+                        continue;
+                    }
+                    String attachmentName = child.substring(child.lastIndexOf("/") + 1);
+                    String attachmentType = resource.getMediaType();
+                    if (FileUtils.filterMatches(attachmentName, attachmentType, fileNamePattern,
+                                                mediaTypePattern
+                    )) {
+                        try {
+                            InputStream contentStream = resource.getContentStream();
+                            Attachment attachment = new Attachment(attachmentName, attachmentType,
+                                                                   contentStream
+                            );
+                            attachments.add(attachment);
+                        }
+                        catch (RegistryException e) {
+                            Log.warn("getContentStream: " + e.getMessage() + " - " + child);
+                            continue;
+                        }
+                    }
+                }
 
-				registry.commitTransaction();
-			}
-			catch (Exception e) {
-				registry.rollbackTransaction();
-				throw e;
-			}
+                if (!attachments.isEmpty()) {
+                    MultipartBody multipartBody = new MultipartBody(attachments, true);
+                    return Response.ok(multipartBody).type("multipart/mixed").build();
+                }
+                else {
+                    return Response.noContent().build();
+                }
+            }
 
-			return Response.noContent().build();
-		}
-		catch (Exception e) {
-			Log.error("uploadFile", e);
-			String errorMsg = String.format("Cannot upload file: %s\n%s", path, e.toString());
-			return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
-		}
-	}
+            return Response.ok(resource.getContentStream(), mediaType).build();
+        }
+        catch (PatternSyntaxException e) {
+            return Response.status(Status.BAD_REQUEST)
+                           .entity("Regexp syntax error: " + e.getMessage())
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (Exception e) {
+            Log.error("getFileOrFolder", e);
+            String errorMsg = String.format("Cannot retrieve entry: %s\n%s", path, e.toString());
+            return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+        }
+    }
 
-	@DELETE
-	@Path("{path:.*}")
-	public Response deleteFileOrFolder(
-			@Context HttpServletRequest request,
-			@PathParam("path") String path,
-			@DefaultValue("false") @QueryParam("public") boolean delPublic) {
+    @POST
+    @Path("{path:.*}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadToFolder(
+        @Context HttpServletRequest request,
+        @PathParam("path") String path,
+        @DefaultValue("false") @QueryParam("public") boolean isPublic,
+        @QueryParam("user") String user,
+        List<Attachment> attachments) {
 
-		String userName = request.getRemoteUser();
+        String userName;
+        String authenticatedUser = getAuthenticatedUser();
 
-		if (userName != null) {
-			userName = MultitenantUtils.getTenantAwareUsername(userName);
-		}
+        // Allowing uploads to someone else files directory. (Requirement for Agent)
+        // TODO: Check permission of authenticated user.
+        if (user != null && user.length() > 0) {
+            userName = user;
+        }
+        else {
+            userName = authenticatedUser;
+        }
 
-		if (!path.startsWith("/")) path = "/" + path;
-		Log.debug(String.format("deleteFileOrFolder: path=%s, public=%s, user=%s", path, delPublic, userName));
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        if (!path.endsWith("/")) {
+            path += "/";
+        }
+        Log.debug(
+            String.format("uploadToFolder: path=%s, public=%s, user=%s", path, isPublic,
+                          userName
+            ));
 
-		if (userName == null)
-			return Response.status(Status.UNAUTHORIZED).entity("Not authenticated").type(MediaType.TEXT_PLAIN).build();
+        if (authenticatedUser == null) {
+            return Response.status(Status.UNAUTHORIZED).entity("Not authenticated")
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
 
-		String publicResPath = _config.getPublicFilesPath() + path;
-		String privateResPath = _config.getUserFilesPath(userName) + path;
-		String resPath = delPublic ? publicResPath : privateResPath;
+        try {
+            UserRegistry registry = RegistryUtils.getUserRegistry(userName);
+            String parentPath = _config.getUserFilesPath(userName) + path;
+            String publicFilesPath = _config.getPublicFilesPath();
 
-		try {
-			UserRegistry registry = _registryUtils.getUserRegistry(userName);
-			if (registry.resourceExists(resPath)) {
-				if (delPublic) {
-					Resource res = registry.get(resPath);
-					boolean isLink = Boolean.parseBoolean(res.getProperty(RegistryConstants.REGISTRY_LINK));
-					String author = res.getProperty(RegistryConstants.REGISTRY_AUTHOR);
-					String targetPath = res.getProperty(RegistryConstants.REGISTRY_TARGET_POINT);
-					if (isLink) {
-						if (userName.equals(author)) {
-							registry.beginTransaction();
-							try {
-								Log.debug("Removing symlink: " + resPath + " -> " + targetPath);
-								registry.removeLink(resPath);
-								RegistryUtils.clearEveryone(targetPath, registry, ActionConstants.GET);
-								registry.commitTransaction();
-								return Response.noContent().build();
-							}
-							catch (Exception e) {
-								registry.rollbackTransaction();
-								throw e;
-							}
-						} else {
-							Log.warn(String.format("User '%s' attempted to remove symlink '%s' " +
-									"owned by '%s' - action denied.", userName, resPath, author));
-							registry.rollbackTransaction();
-							return Response.status(Status.UNAUTHORIZED)
-									.entity("Cannot remove public entry for which you're not an owner")
-									.type(MediaType.TEXT_PLAIN).build();
-						}
-					}
-				}
+            registry.beginTransaction();
+            try {
+                for (Attachment attachment : attachments) {
+                    MediaType contentType = attachment.getContentType();
+                    String fileName = attachment.getContentDisposition().getParameter("filename");
+                    InputStream fileStream = attachment.getDataHandler().getInputStream();
 
-				Log.debug("Removing resource: " + resPath);
-				registry.delete(resPath);
-				return Response.noContent().build();
-			} else
-				return Response.status(Status.NOT_FOUND).build();
-		}
-		catch (Exception e) {
-			Log.error("deleteFileOrFolder", e);
-			String errorMsg = String.format("Cannot delete entry: %s\n%s", path, e.toString());
-			return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
-		}
-	}
+                    Resource fileResource = registry.newResource();
+                    fileResource.setMediaType(contentType.toString());
+                    fileResource.setContentStream(fileStream);
 
+                    String resPath = parentPath + fileName;
+                    resPath = registry.put(resPath, fileResource);
+                    Log.debug("Uploaded: " + resPath);
+
+                    if (isPublic) {
+                        RegistryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
+                        String symlinkPath = publicFilesPath + path + fileName;
+                        Log.debug("Creating symlink: " + symlinkPath + " -> " + resPath);
+                        registry.createLink(symlinkPath, resPath);
+                    }
+                }
+
+                registry.commitTransaction();
+            }
+            catch (Exception e) {
+                registry.rollbackTransaction();
+                throw e;
+            }
+
+            return Response.noContent().build();
+        }
+        catch (Exception e) {
+            Log.error("uploadToFolder", e);
+            String errorMsg = String.format("Cannot upload to folder: %s\n%s", path, e.toString());
+            return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+        }
+    }
+
+    @PUT
+    @Path("{path:.*}")
+    public Response uploadFile(
+        @Context HttpServletRequest request,
+        @HeaderParam("Content-Type") MediaType contentType,
+        @PathParam("path") String path,
+        @DefaultValue("false") @QueryParam("public") boolean isPublic,
+        @QueryParam("user") String user,
+        InputStream fileStream) {
+
+        String userName;
+        String authenticatedUser = getAuthenticatedUser();
+
+        // Allowing uploads to someone else files directory. (Requirement for Agent)
+        // TODO: Check permission of authenticated user.
+        if (user != null && user.length() > 0) {
+            userName = user;
+        }
+        else {
+            userName = authenticatedUser;
+        }
+
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+
+        Log.debug(String.format("uploadFile: path=%s, contentType=%s, public=%s, user=%s", path,
+                                contentType, isPublic, userName
+        ));
+
+        if (authenticatedUser == null) {
+            return Response.status(Status.UNAUTHORIZED).entity("Not authenticated")
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+
+        if (contentType == null) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+        }
+
+        try {
+            UserRegistry registry = RegistryUtils.getUserRegistry(userName);
+
+            String tenantAwareUsername = MultitenantUtils.getTenantAwareUsername(userName);
+            String resPath = _config.getUserFilesPath(tenantAwareUsername) + path;
+
+            registry.beginTransaction();
+            try {
+                Resource fileResource = registry.newResource();
+                fileResource.setMediaType(contentType.toString());
+                fileResource.setContentStream(fileStream);
+
+                resPath = registry.put(resPath, fileResource);
+                Log.debug("Uploaded: " + resPath);
+
+                if (isPublic) {
+                    RegistryUtils.authorizeEveryone(resPath, registry, ActionConstants.GET);
+                    String symlinkPath = _config.getPublicFilesPath() + path;
+                    Log.debug("Creating symlink: " + symlinkPath + " -> " + resPath);
+                    registry.createLink(symlinkPath, resPath);
+                }
+
+                registry.commitTransaction();
+            }
+            catch (Exception e) {
+                registry.rollbackTransaction();
+                throw e;
+            }
+
+            return Response.noContent().build();
+        }
+        catch (Exception e) {
+            Log.error("uploadFile", e);
+            String errorMsg = String.format("Cannot upload file: %s\n%s", path, e.toString());
+            return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+        }
+    }
+
+    @DELETE
+    @Path("{path:.*}")
+    public Response deleteFileOrFolder(
+        @Context HttpServletRequest request,
+        @PathParam("path") String path,
+        @DefaultValue("false") @QueryParam("public") boolean delPublic) {
+
+        String userName = getAuthenticatedUser();
+
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        Log.debug(String.format("deleteFileOrFolder: path=%s, public=%s, user=%s", path, delPublic,
+                                userName
+        ));
+
+        if (userName == null) {
+            return Response.status(Status.UNAUTHORIZED).entity("Not authenticated")
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+
+        String publicResPath = _config.getPublicFilesPath() + path;
+        String privateResPath = _config.getUserFilesPath(userName) + path;
+        String resPath = delPublic ? publicResPath : privateResPath;
+
+        try {
+            UserRegistry registry = RegistryUtils.getUserRegistry(userName);
+            if (registry.resourceExists(resPath)) {
+                if (delPublic) {
+                    Resource res = registry.get(resPath);
+                    boolean isLink = Boolean
+                        .parseBoolean(res.getProperty(RegistryConstants.REGISTRY_LINK));
+                    String author = res.getProperty(RegistryConstants.REGISTRY_AUTHOR);
+                    String targetPath = res.getProperty(RegistryConstants.REGISTRY_TARGET_POINT);
+                    if (isLink) {
+                        if (userName.equals(author)) {
+                            registry.beginTransaction();
+                            try {
+                                Log.debug("Removing symlink: " + resPath + " -> " + targetPath);
+                                registry.removeLink(resPath);
+                                RegistryUtils
+                                    .clearEveryone(targetPath, registry, ActionConstants.GET);
+                                registry.commitTransaction();
+                                return Response.noContent().build();
+                            }
+                            catch (Exception e) {
+                                registry.rollbackTransaction();
+                                throw e;
+                            }
+                        }
+                        else {
+                            Log.warn(String.format(
+                                "User '%s' attempted to remove symlink '%s' " +
+                                    "owned by '%s' - action denied.", userName, resPath, author));
+                            registry.rollbackTransaction();
+                            return Response.status(Status.UNAUTHORIZED)
+                                           .entity(
+                                               "Cannot remove public entry for which you're not an owner")
+                                           .type(MediaType.TEXT_PLAIN).build();
+                        }
+                    }
+                }
+
+                Log.debug("Removing resource: " + resPath);
+                registry.delete(resPath);
+                return Response.noContent().build();
+            }
+            else {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+        }
+        catch (Exception e) {
+            Log.error("deleteFileOrFolder", e);
+            String errorMsg = String.format("Cannot delete entry: %s\n%s", path, e.toString());
+            return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+        }
+    }
+
+    /**
+     * Return the currently authenticated user
+     *
+     * @return The currently authenticated user, or null if not authenticated
+     */
+    protected String getAuthenticatedUser() {
+        String remoteUser = _request.getRemoteUser();
+
+        return (remoteUser != null) ?
+            // Extract user name part from username with tenant (e.g. admin@carbon.super)
+            MultitenantUtils.getTenantAwareUsername(remoteUser) :
+            null;
+    }
 }
