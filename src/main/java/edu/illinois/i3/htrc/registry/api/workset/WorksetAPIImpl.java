@@ -1,5 +1,6 @@
 package edu.illinois.i3.htrc.registry.api.workset;
 
+import edu.illinois.i3.htrc.registry.api.Constants;
 import edu.illinois.i3.htrc.registry.api.HTRCMediaTypes;
 import edu.illinois.i3.htrc.registry.api.RegistryExtension;
 import edu.illinois.i3.htrc.registry.api.RegistryExtensionConfig;
@@ -138,6 +139,7 @@ public class WorksetAPIImpl implements WorksetAPI {
                     resource = WorksetUtils.createResourceFromWorkset(workset, _registry);
                 }
 
+                resource.setProperty(Constants.HTRC_PROP_PUBLIC, Boolean.toString(isPublic));
                 resPath = _registry.put(resPath, resource);
                 WorksetMeta updatedMeta =
                     WorksetUtils.updateResourceCommunityMeta(resource, worksetMeta, _registry);

@@ -190,6 +190,7 @@ public class WorksetsAPIImpl implements WorksetsAPI {
             registry.beginTransaction();
             try {
                 Resource resource = WorksetUtils.createResourceFromWorkset(workset, registry);
+                resource.setProperty(Constants.HTRC_PROP_PUBLIC, Boolean.toString(isPublic));
                 resPath = registry.put(resPath, resource);
                 resUri = WorksetUtils.getWorksetUri(resPath);
                 Log.debug("Created workset: " + resPath);
@@ -251,7 +252,7 @@ public class WorksetsAPIImpl implements WorksetsAPI {
      * @return The currently authenticated user, or null if not authenticated
      */
     protected String getAuthenticatedUser() {
-        String remoteUser = _request.getRemoteUser();
+        String remoteUser = _request.getRemoteUser(); // debugUserName;
 
         return (remoteUser != null) ?
             // Extract user name part from username with tenant (e.g. admin@carbon.super)

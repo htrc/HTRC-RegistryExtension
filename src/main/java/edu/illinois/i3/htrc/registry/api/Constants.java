@@ -76,6 +76,11 @@ public class Constants {
     public static final String HTRC_PROP_VOLCOUNT = "htrc.volumeCount";
 
     /**
+     * The property specifying whether the resource is public or private
+     */
+    public static final String HTRC_PROP_PUBLIC = "htrc.public";
+
+    /**
      * Regex pattern to validate HTRC volume IDs
      */
     public static final Pattern VALID_HTRC_ID_REGEX = Pattern.compile("^\\w{2,4}\\.\\S{4,30}$");
