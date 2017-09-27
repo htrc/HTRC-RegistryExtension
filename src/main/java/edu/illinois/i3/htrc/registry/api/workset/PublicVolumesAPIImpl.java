@@ -29,7 +29,6 @@ import org.supercsv.encoder.DefaultCsvEncoder;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
-import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
 import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
@@ -73,7 +72,7 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
             String resPath = _config.getWorksetPath(_worksetId, author);
 
             // check if public workset
-            if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET)) {
+            if (!RegistryUtils.isPublicResource(resPath, _registry)) {
                 throw new AuthorizationFailedException(
                     String.format("%s is not a public workset", _worksetId));
             }
@@ -123,7 +122,7 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
             String resPath = _config.getWorksetPath(_worksetId, author);
 
             // check if public workset
-            if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET)) {
+            if (!RegistryUtils.isPublicResource(resPath, _registry)) {
                 throw new AuthorizationFailedException(
                     String.format("%s is not a public workset", _worksetId));
             }
@@ -225,7 +224,7 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
             String resPath = _config.getWorksetPath(_worksetId, author);
 
             // check if public workset
-            if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET)) {
+            if (!RegistryUtils.isPublicResource(resPath, _registry)) {
                 throw new AuthorizationFailedException(
                     String.format("%s is not a public workset", _worksetId));
             }

@@ -1,5 +1,6 @@
 package edu.illinois.i3.htrc.registry.api.file;
 
+import edu.illinois.i3.htrc.registry.api.Constants;
 import edu.illinois.i3.htrc.registry.api.HTRCMediaTypes;
 import edu.illinois.i3.htrc.registry.api.RegistryExtension;
 import edu.illinois.i3.htrc.registry.api.RegistryExtensionConfig;
@@ -340,6 +341,7 @@ public class FilesAPIImpl implements FilesAPI {
                     fileResource.setContentStream(fileStream);
 
                     String resPath = parentPath + fileName;
+                    fileResource.setProperty(Constants.HTRC_PROP_PUBLIC, Boolean.toString(isPublic));
                     resPath = registry.put(resPath, fileResource);
                     Log.debug("Uploaded: " + resPath);
 
@@ -417,7 +419,7 @@ public class FilesAPIImpl implements FilesAPI {
                 Resource fileResource = registry.newResource();
                 fileResource.setMediaType(contentType.toString());
                 fileResource.setContentStream(fileStream);
-
+                fileResource.setProperty(Constants.HTRC_PROP_PUBLIC, Boolean.toString(isPublic));
                 resPath = registry.put(resPath, fileResource);
                 Log.debug("Uploaded: " + resPath);
 

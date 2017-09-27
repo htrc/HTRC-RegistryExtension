@@ -1,5 +1,7 @@
 package edu.illinois.i3.htrc.registry.api.utils;
 
+import edu.illinois.i3.htrc.registry.api.Constants;
+import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -176,28 +178,20 @@ public class RegistryUtils {
     }
 
     /**
-     * Checks whether the resource has the specified public permissions
+     * Checks whether the resource is supposed to be publicly accessible
      *
      * @param resPath     The resource path
      * @param registry    The {@link UserRegistry} instance
-     * @param permissions The permissions to check
      * @return True if the resource has the specified public permissions, False otherwise
      * @throws RegistryException  Thrown if a registry error occurs
-     * @throws UserStoreException Thrown if a user store error occurs
      */
-    public static boolean isEveryoneAuthorized(
-        String resPath, UserRegistry registry,
-        String... permissions) throws RegistryException, UserStoreException {
-        UserRealm userRealm = registry.getUserRealm();
-        AuthorizationManager authManager = userRealm.getAuthorizationManager();
+    public static boolean isPublicResource(
+        String resPath, UserRegistry registry) throws RegistryException {
 
-        for (String permission : permissions) {
-            if (!authManager.isRoleAuthorized(_everyoneRole, resPath, permission)) {
-                return false;
-            }
-        }
+        Resource resource = registry.get(resPath);
+        String sPublic = resource.getProperty(Constants.HTRC_PROP_PUBLIC);
 
-        return true;
+        return Boolean.parseBoolean(sPublic);
     }
 
     /**

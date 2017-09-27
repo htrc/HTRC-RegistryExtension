@@ -188,8 +188,8 @@ public class WorksetUtils {
         worksetMeta.setVolumeCount(volumeCount);
 
         try {
-            worksetMeta.setPublic(
-                RegistryUtils.isEveryoneAuthorized(resPath, registry, ActionConstants.GET));
+            boolean isPublic = RegistryUtils.isPublicResource(resPath, registry);
+            worksetMeta.setPublic(isPublic);
         }
         catch (Exception e) {
             throw new RegistryException("Error getting resource permissions", e);

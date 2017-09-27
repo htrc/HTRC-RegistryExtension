@@ -15,7 +15,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
@@ -56,7 +55,7 @@ public class PublicWorksetAPIImpl implements PublicWorksetAPI {
             String resPath = _config.getWorksetPath(_worksetId, author);
 
             // check if public workset
-            if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET)) {
+            if (!RegistryUtils.isPublicResource(resPath, _registry)) {
                 throw new AuthorizationFailedException(
                     String.format("%s is not a public workset", _worksetId));
             }
@@ -108,7 +107,7 @@ public class PublicWorksetAPIImpl implements PublicWorksetAPI {
             String resPath = _config.getWorksetPath(_worksetId, author);
 
             // check if public workset
-            if (!RegistryUtils.isEveryoneAuthorized(resPath, _registry, ActionConstants.GET)) {
+            if (!RegistryUtils.isPublicResource(resPath, _registry)) {
                 throw new AuthorizationFailedException(
                     String.format("%s is not a public workset", _worksetId));
             }
