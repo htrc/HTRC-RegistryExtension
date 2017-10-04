@@ -85,12 +85,12 @@ public class WorksetsAPIImpl implements WorksetsAPI {
         List<Workset> worksetList = worksets.getWorksets();
 
         try {
-            UserRegistry registry = RegistryUtils.getUserRegistry(userName);
+            UserRegistry registry = RegistryUtils.getAdminRegistry();
             String userWorksetsPath = _config.getUserWorksetsPath(userName);
             Collection userWorksetCollection = (Collection) registry.get(userWorksetsPath);
 
             Set<String> worksetsPaths =
-                WorksetUtils.getWorksetsPaths(userWorksetCollection, registry);
+                WorksetUtils.getWorksetsPaths(userWorksetCollection);
 
             if (includePublic) {
                 Set<String> publicWorksetsPaths =
