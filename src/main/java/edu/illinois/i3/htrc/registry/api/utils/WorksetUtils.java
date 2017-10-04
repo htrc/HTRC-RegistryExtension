@@ -19,7 +19,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -290,32 +292,13 @@ public class WorksetUtils {
      * Retrieves the worksets paths from a given collection
      *
      * @param worksetCollection The collection
-     * @param registry          The registry instance
      * @return The worksets paths
      * @throws RegistryException Thrown if an error occurs while accessing the registry
      */
-    public static Set<String> getWorksetsPaths(Collection worksetCollection, UserRegistry registry)
+    public static Set<String> getWorksetsPaths(Collection worksetCollection)
         throws RegistryException {
-        Set<String> worksetsPaths = new HashSet<>();
-
-        for (String child : worksetCollection.getChildren()) {
-            try {
-                Resource resource = registry.get(child);
-                worksetsPaths.add(resource.getPath());
-
-                if (Log.isDebugEnabled()) {
-                    LogUtils.logResource(Log, resource);
-                }
-            }
-            catch (AuthorizationFailedException afe) {
-                Log.warn(String.format(
-                    "getWorksetsPaths: Registry authorization failure for '%s' (Message: %s)",
-                    child, afe.getMessage()
-                ));
-            }
-        }
-
-        return worksetsPaths;
+        String[] children = worksetCollection.getChildren();
+        return new HashSet<>(Arrays.asList(children));
     }
 
     /**
@@ -329,8 +312,10 @@ public class WorksetUtils {
     public static List<WorksetMeta> getWorksetsMeta(Collection collection, UserRegistry registry)
         throws RegistryException {
 
-        List<WorksetMeta> worksetsMeta = new ArrayList<>();
-        for (String child : collection.getChildren()) {
+        String[] children = collection.getChildren();
+        List<WorksetMeta> worksetsMeta = new ArrayList<>(children.length);
+
+        for (String child : children) {
             try {
                 Resource resource = registry.get(child);
 
