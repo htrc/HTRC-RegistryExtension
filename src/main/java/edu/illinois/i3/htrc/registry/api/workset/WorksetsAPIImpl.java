@@ -158,7 +158,7 @@ public class WorksetsAPIImpl implements WorksetsAPI {
             List<Volume> volumes = worksetContent.getVolumes();
             for (Volume volume : volumes) {
                 String volumeId = volume.getId();
-                if (!Constants.VALID_HTRC_ID_REGEX.matcher(volumeId).matches()) {
+                if (!volumeId.contains(".")) {
                     String errorMsg = "Invalid volume ID detected in workset: " + volumeId;
                     return Response.status(Status.BAD_REQUEST).entity(errorMsg)
                                    .type(MediaType.TEXT_PLAIN)
@@ -193,6 +193,9 @@ public class WorksetsAPIImpl implements WorksetsAPI {
                 resource.setProperty(Constants.HTRC_PROP_PUBLIC, Boolean.toString(isPublic));
                 resPath = registry.put(resPath, resource);
                 resUri = WorksetUtils.getWorksetUri(resPath);
+                if (resUri == null)
+                    throw new Exception("Could not get a valid URI for location: " + resPath);
+
                 Log.debug("Created workset: " + resPath);
                 WorksetMeta updatedMeta = WorksetUtils.updateResourceCommunityMeta(
                     resource, workset.getMetadata(), registry);

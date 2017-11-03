@@ -1,7 +1,5 @@
 package edu.illinois.i3.htrc.registry.api;
 
-import java.util.regex.Pattern;
-
 /**
  * Constants used in the Registry Extension
  *
@@ -79,9 +77,4 @@ public class Constants {
      * The property specifying whether the resource is public or private
      */
     public static final String HTRC_PROP_PUBLIC = "htrc.public";
-
-    /**
-     * Regex pattern to validate HTRC volume IDs
-     */
-    public static final Pattern VALID_HTRC_ID_REGEX = Pattern.compile("^\\w{2,4}\\.\\S{4,30}$");
 }
