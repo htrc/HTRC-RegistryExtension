@@ -222,7 +222,7 @@ public class WorksetUtils {
      */
     public static URI getWorksetUri(String worksetResPath) {
         try {
-            return new URI(worksetResPath);
+            return new URI(null, null, null, -1, worksetResPath, null, null);
         }
         catch (URISyntaxException e) {
             return null;
