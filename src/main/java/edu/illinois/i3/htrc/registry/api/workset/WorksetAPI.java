@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -26,6 +27,14 @@ import javax.ws.rs.core.Response;
     MediaType.APPLICATION_JSON
 })
 public interface WorksetAPI {
+
+    /**
+     * HEAD: Checks whether a workset exists
+     *
+     * @return 200 OK if exists, 404 NOT FOUND if it doesn't exists
+     */
+    @HEAD
+    Response checkWorksetExists();
 
     /**
      * GET: Retrieve a workset

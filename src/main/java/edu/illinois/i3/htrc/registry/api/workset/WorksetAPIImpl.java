@@ -14,6 +14,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -49,6 +50,35 @@ public class WorksetAPIImpl implements WorksetAPI {
         _registry = registry;
         _userName = registry.getUserName();
         _config = RegistryExtension.getConfig();
+    }
+
+    @HEAD
+    public Response checkWorksetExists() {
+        Log.debug(
+            String.format("checkWorksetExists: id=%s, user=%s", _worksetId, _userName)
+        );
+
+        try {
+            String resPath = _config.getWorksetPath(_worksetId, _userName);
+            if (_registry.resourceExists(resPath))
+                return Response.ok().build();
+            else
+                return Response.status(Status.NOT_FOUND).build();
+        }
+        catch (AuthorizationFailedException e) {
+            return Response.status(Status.UNAUTHORIZED).entity("Insufficient permissions")
+                           .type(MediaType.TEXT_PLAIN).build();
+        }
+        catch (ResourceNotFoundException e) {
+            String errorMsg = "Unable to locate workset: " + _worksetId;
+            return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
+                           .build();
+        }
+        catch (RegistryException e) {
+            Log.error("getWorkset", e);
+            String errorMsg = String.format("Cannot retrieve workset: %s", e.toString());
+            return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
+        }
     }
 
     @GET
