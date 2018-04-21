@@ -66,7 +66,7 @@ public class Constants {
     /**
      * The regular expression used to validate registry resource names
      */
-    public static final String ILLEGAL_CHARACTERS_FOR_PATH = ".*[~!@#;%^*+={}/\\|\\\\<>\",\'].*";
+    public static final String ILLEGAL_CHARACTERS_FOR_PATH = ".*[~!@#;%^*+={}\\[\\]/|\\\\<>\",\'].*";
 
     /**
      * The property used for workset resources to store the volume count of volumes in the workset
