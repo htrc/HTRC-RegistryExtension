@@ -192,9 +192,10 @@ public class WorksetsAPIImpl implements WorksetsAPI {
                 Resource resource = WorksetUtils.createResourceFromWorkset(workset, registry);
                 resource.setProperty(Constants.HTRC_PROP_PUBLIC, Boolean.toString(isPublic));
                 resPath = registry.put(resPath, resource);
-                resUri = WorksetUtils.getWorksetUri(worksetName);
+                resUri = WorksetUtils.getWorksetNameUri(worksetName);
                 if (resUri == null)
                     throw new Exception("Could not get a valid URI for: " + worksetName);
+                resUri = new URI(_request.getRequestURL().toString()).resolve(resUri);
 
                 Log.debug("Created workset: " + resPath);
                 WorksetMeta updatedMeta = WorksetUtils.updateResourceCommunityMeta(
