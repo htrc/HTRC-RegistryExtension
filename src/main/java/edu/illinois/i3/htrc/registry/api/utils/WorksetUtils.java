@@ -215,14 +215,14 @@ public class WorksetUtils {
     }
 
     /**
-     * Return the URI for a workset path
+     * Return the URI component for a workset name
      *
-     * @param worksetResPath The workset path
+     * @param worksetName The workset name
      * @return The URI
      */
-    public static URI getWorksetUri(String worksetResPath) {
+    public static URI getWorksetNameUri(String worksetName) {
         try {
-            return new URI(null, null, null, -1, worksetResPath, null, null);
+            return new URI(null, null, null, -1, "./" + worksetName, null, null);
         }
         catch (URISyntaxException e) {
             return null;
