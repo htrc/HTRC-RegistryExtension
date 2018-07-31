@@ -4,6 +4,7 @@ import edu.illinois.i3.htrc.registry.api.Constants;
 import edu.illinois.i3.htrc.registry.api.HTRCMediaTypes;
 import edu.illinois.i3.htrc.registry.api.RegistryExtension;
 import edu.illinois.i3.htrc.registry.api.RegistryExtensionConfig;
+import edu.illinois.i3.htrc.registry.api.exceptions.RegistryExtensionException;
 import edu.illinois.i3.htrc.registry.api.utils.LogUtils;
 import edu.illinois.i3.htrc.registry.api.utils.RegistryUtils;
 import edu.illinois.i3.htrc.registry.api.utils.WorksetUtils;
@@ -45,7 +46,7 @@ public class WorksetAPIImpl implements WorksetAPI {
     private final String _userName;
     private final RegistryExtensionConfig _config;
 
-    public WorksetAPIImpl(String worksetId, UserRegistry registry) throws RegistryException {
+    public WorksetAPIImpl(String worksetId, UserRegistry registry) {
         _worksetId = worksetId;
         _registry = registry;
         _userName = registry.getUserName();
@@ -91,6 +92,14 @@ public class WorksetAPIImpl implements WorksetAPI {
         try {
             if (author == null) {
                 author = _userName;
+            } else {
+                String userName = RegistryUtils.getUserIdForAlias(author);
+                if (userName == null) {
+                    String errorMsg = "Unknown author: " + author;
+                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
+                                   .build();
+                }
+                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
             Resource resource = _registry.get(resPath);
@@ -112,7 +121,7 @@ public class WorksetAPIImpl implements WorksetAPI {
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
                            .build();
         }
-        catch (RegistryException e) {
+        catch (RegistryException | RegistryExtensionException e) {
             Log.error("getWorkset", e);
             String errorMsg = String.format("Cannot retrieve workset: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -242,6 +251,14 @@ public class WorksetAPIImpl implements WorksetAPI {
         try {
             if (author == null) {
                 author = _userName;
+            } else {
+                String userName = RegistryUtils.getUserIdForAlias(author);
+                if (userName == null) {
+                    String errorMsg = "Unknown author: " + author;
+                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
+                                   .build();
+                }
+                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
             Resource resource = _registry.get(resPath);
@@ -265,7 +282,7 @@ public class WorksetAPIImpl implements WorksetAPI {
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
                            .build();
         }
-        catch (RegistryException e) {
+        catch (RegistryException | RegistryExtensionException e) {
             Log.error("getWorksetMeta", e);
             String errorMsg = String.format("Cannot retrieve workset meta: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();

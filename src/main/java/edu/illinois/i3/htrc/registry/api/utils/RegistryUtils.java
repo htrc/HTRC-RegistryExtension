@@ -1,6 +1,7 @@
 package edu.illinois.i3.htrc.registry.api.utils;
 
 import edu.illinois.i3.htrc.registry.api.Constants;
+import edu.illinois.i3.htrc.registry.api.exceptions.RegistryExtensionException;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -10,6 +11,7 @@ import org.wso2.carbon.user.api.RealmConfiguration;
 import org.wso2.carbon.user.core.AuthorizationManager;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
+import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 
 /**
@@ -252,5 +254,53 @@ public class RegistryUtils {
      */
     public static int getTenantId() {
         return _tenantId;
+    }
+
+    /**
+     * Retrieves a user's alias (as set in their WSO2 profile, or null if not set)
+     *
+     * @param userId The user id
+     * @return The user's alias (or null if not set)
+     * @throws RegistryException Thrown if a registry error occurs
+     */
+    public static String getUserAlias(String userId) throws RegistryException {
+        try {
+            UserStoreManager userStoreManager = getAdminRegistry()
+                .getUserRealm()
+                .getUserStoreManager();
+            return userStoreManager.getUserClaimValue(userId, Constants.HTRC_USER_ALIAS_CLAIM_URL, null);
+        }
+        catch (UserStoreException e) {
+            throw new RegistryException("getUserStoreManager error", e);
+        }
+    }
+
+    /**
+     * Retrieves a the user id associated with a given alias
+     *
+     * @param alias The alias
+     * @return The user id, or null is none were found
+     * @throws RegistryException Thrown if a registry error occurs
+     * @throws RegistryExtensionException Thrown if more than one user is associated with the given alias
+     */
+    public static String getUserIdForAlias(String alias) throws RegistryException,
+                                                                RegistryExtensionException {
+        try {
+            UserStoreManager userStoreManager = getAdminRegistry()
+                .getUserRealm()
+                .getUserStoreManager();
+            String[] userList = userStoreManager.getUserList(Constants.HTRC_USER_ALIAS_CLAIM_URL, alias, null);
+            if (userList != null) {
+                switch (userList.length) {
+                    case 0: return null;
+                    case 1: return userList[0];
+                    default: throw new RegistryExtensionException(String.format("The user alias '%s' is associated with more than one user!", alias));
+                }
+            } else
+                return null;
+        }
+        catch (UserStoreException e) {
+            throw new RegistryException("getUserStoreManager error", e);
+        }
     }
 }

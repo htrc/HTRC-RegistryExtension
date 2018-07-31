@@ -4,6 +4,7 @@ import edu.illinois.i3.htrc.registry.api.Constants;
 import edu.illinois.i3.htrc.registry.api.HTRCMediaTypes;
 import edu.illinois.i3.htrc.registry.api.RegistryExtension;
 import edu.illinois.i3.htrc.registry.api.RegistryExtensionConfig;
+import edu.illinois.i3.htrc.registry.api.utils.RegistryUtils;
 import edu.illinois.i3.htrc.registry.api.utils.WorksetUtils;
 import edu.illinois.i3.htrc.registry.entities.workset.Property;
 import edu.illinois.i3.htrc.registry.entities.workset.Volume;
@@ -69,6 +70,14 @@ public class VolumesAPIImpl implements VolumesAPI {
         try {
             if (author == null) {
                 author = _userName;
+            } else {
+                String userName = RegistryUtils.getUserIdForAlias(author);
+                if (userName == null) {
+                    String errorMsg = "Unknown author: " + author;
+                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
+                                   .build();
+                }
+                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
             Resource resource = _registry.get(resPath);
@@ -111,6 +120,14 @@ public class VolumesAPIImpl implements VolumesAPI {
         try {
             if (author == null) {
                 author = _userName;
+            } else {
+                String userName = RegistryUtils.getUserIdForAlias(author);
+                if (userName == null) {
+                    String errorMsg = "Unknown author: " + author;
+                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
+                                   .build();
+                }
+                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
             Resource resource = _registry.get(resPath);
@@ -204,6 +221,14 @@ public class VolumesAPIImpl implements VolumesAPI {
         try {
             if (author == null) {
                 author = _userName;
+            } else {
+                String userName = RegistryUtils.getUserIdForAlias(author);
+                if (userName == null) {
+                    String errorMsg = "Unknown author: " + author;
+                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
+                                   .build();
+                }
+                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
             Resource resource = _registry.get(resPath);

@@ -176,7 +176,8 @@ public class WorksetUtils {
         WorksetMeta worksetMeta = new WorksetMeta();
         worksetMeta.setName(name);
         worksetMeta.setDescription(resource.getDescription());
-        worksetMeta.setAuthor(resource.getAuthorUserName());
+        String author = RegistryUtils.getUserAlias(resource.getAuthorUserName());
+        worksetMeta.setAuthor(author);
         String sVolCount = resource.getProperty(Constants.HTRC_PROP_VOLCOUNT);
         if (sVolCount == null) {
             Log.warn(
