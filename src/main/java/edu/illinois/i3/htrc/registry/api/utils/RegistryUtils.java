@@ -271,7 +271,26 @@ public class RegistryUtils {
             return userStoreManager.getUserClaimValue(userId, Constants.HTRC_USER_ALIAS_CLAIM_URL, null);
         }
         catch (UserStoreException e) {
-            throw new RegistryException("getUserStoreManager error", e);
+            throw new RegistryException("getUserAlias error", e);
+        }
+    }
+
+    /**
+     * Retrieves a user's GUID, or null if not set
+     *
+     * @param userId The user id
+     * @return The user's GUID (or null if not set)
+     * @throws RegistryException Thrown if a registry error occurs
+     */
+    public static String getUserGuid(String userId) throws RegistryException {
+        try {
+            UserStoreManager userStoreManager = getAdminRegistry()
+                .getUserRealm()
+                .getUserStoreManager();
+            return userStoreManager.getUserClaimValue(userId, Constants.HTRC_USER_GUID_CLAIM_URL, null);
+        }
+        catch (UserStoreException e) {
+            throw new RegistryException("getUserGuid error", e);
         }
     }
 

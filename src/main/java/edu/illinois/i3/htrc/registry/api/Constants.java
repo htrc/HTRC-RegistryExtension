@@ -82,4 +82,9 @@ public class Constants {
      * The claim URL for retrieving a user's alias
      */
     public static final String HTRC_USER_ALIAS_CLAIM_URL = "http://wso2.org/claims/displayName";
+
+    /**
+     * The claim URL for retrieving a user's GUID
+     */
+    public static final String HTRC_USER_GUID_CLAIM_URL = "http://wso2.org/claims/globalid";
 }
