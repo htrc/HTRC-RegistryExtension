@@ -77,4 +77,14 @@ public class Constants {
      * The property specifying whether the resource is public or private
      */
     public static final String HTRC_PROP_PUBLIC = "htrc.public";
+
+    /**
+     * The claim URL for retrieving a user's alias
+     */
+    public static final String HTRC_USER_ALIAS_CLAIM_URL = "http://wso2.org/claims/displayName";
+
+    /**
+     * The claim URL for retrieving a user's GUID
+     */
+    public static final String HTRC_USER_GUID_CLAIM_URL = "http://wso2.org/claims/globalid";
 }

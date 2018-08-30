@@ -44,14 +44,21 @@ public class PublicWorksetAPIImpl implements PublicWorksetAPI {
     public Response getPublicWorkset(@QueryParam("author") String author) {
         Log.debug(String.format("getPublicWorkset: id=%s, author=%s", _worksetId, author));
 
-        if (author == null) {
-            return Response.status(Status.BAD_REQUEST)
-                           .entity("author parameter is mandatory")
-                           .type(MediaType.TEXT_PLAIN)
-                           .build();
-        }
-
         try {
+            if (author == null) {
+                return Response.status(Status.BAD_REQUEST)
+                               .entity("author parameter is mandatory")
+                               .type(MediaType.TEXT_PLAIN)
+                               .build();
+            } else {
+                String userName = RegistryUtils.getUserIdForAlias(author);
+                if (userName == null) {
+                    String errorMsg = "Unknown author: " + author;
+                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
+                                   .build();
+                }
+                author = userName;
+            }
             String resPath = _config.getWorksetPath(_worksetId, author);
 
             // check if public workset
@@ -96,14 +103,21 @@ public class PublicWorksetAPIImpl implements PublicWorksetAPI {
     public Response getPublicWorksetMeta(@QueryParam("author") String author) {
         Log.debug(String.format("getPublicWorksetMeta: id=%s, author=%s", _worksetId, author));
 
-        if (author == null) {
-            return Response.status(Status.BAD_REQUEST)
-                           .entity("author parameter is mandatory")
-                           .type(MediaType.TEXT_PLAIN)
-                           .build();
-        }
-
         try {
+            if (author == null) {
+                return Response.status(Status.BAD_REQUEST)
+                               .entity("author parameter is mandatory")
+                               .type(MediaType.TEXT_PLAIN)
+                               .build();
+            } else {
+                String userName = RegistryUtils.getUserIdForAlias(author);
+                if (userName == null) {
+                    String errorMsg = "Unknown author: " + author;
+                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
+                                   .build();
+                }
+                author = userName;
+            }
             String resPath = _config.getWorksetPath(_worksetId, author);
 
             // check if public workset
