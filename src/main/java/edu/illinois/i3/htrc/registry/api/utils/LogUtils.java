@@ -26,7 +26,8 @@ public class LogUtils {
 
         log.debug(String.format("=== Workset: %s ===", metadata.getName()));
         logIfNotNull(log, "description: %s", metadata.getDescription());
-        logIfNotNull(log, "author: %s", metadata.getAuthor());
+        logIfNotNull(log, "authorId: %s", metadata.getAuthorId());
+        logIfNotNull(log, "authorAlias: %s", metadata.getAuthorAlias());
 
         if (!metadata.getTags().isEmpty()) {
             StringBuilder sb = new StringBuilder();

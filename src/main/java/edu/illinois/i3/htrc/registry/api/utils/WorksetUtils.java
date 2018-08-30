@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -176,7 +175,11 @@ public class WorksetUtils {
         WorksetMeta worksetMeta = new WorksetMeta();
         worksetMeta.setName(name);
         worksetMeta.setDescription(resource.getDescription());
-        worksetMeta.setAuthor(resource.getAuthorUserName());
+        String authorUserName = resource.getAuthorUserName();
+        String authorGuid = RegistryUtils.getUserGuid(authorUserName);
+        String authorAlias = RegistryUtils.getUserAlias(authorUserName);
+        worksetMeta.setAuthorId(authorGuid);
+        worksetMeta.setAuthorAlias(authorAlias);
         String sVolCount = resource.getProperty(Constants.HTRC_PROP_VOLCOUNT);
         if (sVolCount == null) {
             Log.warn(
@@ -204,8 +207,6 @@ public class WorksetUtils {
         calendar = Calendar.getInstance();
         calendar.setTime(resource.getCreatedTime());
         worksetMeta.setCreated(calendar);
-
-        worksetMeta.setLastModifiedBy(resource.getLastUpdaterUserName());
 
         for (Tag tag : tags) {
             worksetMeta.getTags().add(tag.getTagName());
