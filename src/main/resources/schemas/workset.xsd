@@ -11,8 +11,7 @@
         <sequence>
             <element name="name" type="string"/>
             <element name="description" type="string"/>
-            <element minOccurs="0" name="authorId" type="string"/>
-            <element minOccurs="0" name="authorAlias" type="string"/>
+            <element minOccurs="0" name="author" type="string"/>
             <element minOccurs="0" name="created" type="dateTime"/>
             <element minOccurs="0" name="lastModified" type="dateTime"/>
             <!--<element minOccurs="0" name="lastModifiedBy" type="string"/>-->
