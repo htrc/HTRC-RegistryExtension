@@ -67,14 +67,6 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
                                .entity("author parameter is mandatory")
                                .type(MediaType.TEXT_PLAIN)
                                .build();
-            } else {
-                String userName = RegistryUtils.getUserIdForAlias(author);
-                if (userName == null) {
-                    String errorMsg = "Unknown author: " + author;
-                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                                   .build();
-                }
-                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
 
@@ -124,14 +116,6 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
                                .entity("author parameter is mandatory")
                                .type(MediaType.TEXT_PLAIN)
                                .build();
-            } else {
-                String userName = RegistryUtils.getUserIdForAlias(author);
-                if (userName == null) {
-                    String errorMsg = "Unknown author: " + author;
-                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                                   .build();
-                }
-                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
 
@@ -233,14 +217,6 @@ public class PublicVolumesAPIImpl implements PublicVolumesAPI {
                                .entity("author parameter is mandatory")
                                .type(MediaType.TEXT_PLAIN)
                                .build();
-            } else {
-                String userName = RegistryUtils.getUserIdForAlias(author);
-                if (userName == null) {
-                    String errorMsg = "Unknown author: " + author;
-                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                                   .build();
-                }
-                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
 

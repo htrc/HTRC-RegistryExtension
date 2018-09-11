@@ -176,10 +176,7 @@ public class WorksetUtils {
         worksetMeta.setName(name);
         worksetMeta.setDescription(resource.getDescription());
         String authorUserName = resource.getAuthorUserName();
-        String authorGuid = RegistryUtils.getUserGuid(authorUserName);
-        String authorAlias = RegistryUtils.getUserAlias(authorUserName);
-        worksetMeta.setAuthorId(authorGuid);
-        worksetMeta.setAuthorAlias(authorAlias);
+        worksetMeta.setAuthor(authorUserName);
         String sVolCount = resource.getProperty(Constants.HTRC_PROP_VOLCOUNT);
         if (sVolCount == null) {
             Log.warn(

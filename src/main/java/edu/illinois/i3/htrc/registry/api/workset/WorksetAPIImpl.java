@@ -92,14 +92,6 @@ public class WorksetAPIImpl implements WorksetAPI {
         try {
             if (author == null) {
                 author = _userName;
-            } else {
-                String userName = RegistryUtils.getUserIdForAlias(author);
-                if (userName == null) {
-                    String errorMsg = "Unknown author: " + author;
-                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                                   .build();
-                }
-                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
             Resource resource = _registry.get(resPath);
@@ -121,7 +113,7 @@ public class WorksetAPIImpl implements WorksetAPI {
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
                            .build();
         }
-        catch (RegistryException | RegistryExtensionException e) {
+        catch (RegistryException  e) {
             Log.error("getWorkset", e);
             String errorMsg = String.format("Cannot retrieve workset: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
@@ -251,14 +243,6 @@ public class WorksetAPIImpl implements WorksetAPI {
         try {
             if (author == null) {
                 author = _userName;
-            } else {
-                String userName = RegistryUtils.getUserIdForAlias(author);
-                if (userName == null) {
-                    String errorMsg = "Unknown author: " + author;
-                    return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
-                                   .build();
-                }
-                author = userName;
             }
             String resPath = _config.getWorksetPath(_worksetId, author);
             Resource resource = _registry.get(resPath);
@@ -282,7 +266,7 @@ public class WorksetAPIImpl implements WorksetAPI {
             return Response.status(Status.NOT_FOUND).entity(errorMsg).type(MediaType.TEXT_PLAIN)
                            .build();
         }
-        catch (RegistryException | RegistryExtensionException e) {
+        catch (RegistryException e) {
             Log.error("getWorksetMeta", e);
             String errorMsg = String.format("Cannot retrieve workset meta: %s", e.toString());
             return Response.serverError().entity(errorMsg).type(MediaType.TEXT_PLAIN).build();
